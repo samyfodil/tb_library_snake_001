@@ -13,7 +13,7 @@ func info() BattlesnakeInfoResponse {
 		Author:     "",           // TODO: Your Battlesnake username
 		Color:      "#099a40",    // TODO: Choose color
 		Head:       "all-seeing", // TODO: Choose head
-		Tail:       "mlh-gene",   // TODO: Choose tail
+		Tail:       "coffee",     // TODO: Choose tail
 	}
 }
 
@@ -139,4 +139,151 @@ func domove(state GameState) BattlesnakeMoveResponse {
 	}
 
 	return BattlesnakeMoveResponse{Move: nextMove}
+}
+
+func domove2(state GameState) BattlesnakeMoveResponse {
+
+	isMoveSafe := map[string]bool{
+		"up":    true,
+		"down":  true,
+		"left":  true,
+		"right": true,
+	}
+
+	myHead := state.You.Body[0]
+	myNeck := state.You.Body[1]
+
+	if myNeck.X < myHead.X {
+		isMoveSafe["left"] = false
+
+	} else if myNeck.X > myHead.X {
+		isMoveSafe["right"] = false
+
+	} else if myNeck.Y < myHead.Y {
+		isMoveSafe["down"] = false
+
+	} else if myNeck.Y > myHead.Y {
+		isMoveSafe["up"] = false
+	}
+
+	boardWidth := state.Board.Width
+	boardHeight := state.Board.Height
+
+	// Prevent moving out of bounds
+	if myHead.X == 0 {
+		isMoveSafe["left"] = false
+	} else if myHead.X == boardWidth-1 {
+		isMoveSafe["right"] = false
+	}
+	if myHead.Y == 0 {
+		isMoveSafe["down"] = false
+	} else if myHead.Y == boardHeight-1 {
+		isMoveSafe["up"] = false
+	}
+
+	// Prevent colliding with itself
+	for _, coord := range state.You.Body[1:] {
+		if coord.X == myHead.X {
+			if coord.Y < myHead.Y {
+				isMoveSafe["down"] = false
+			} else {
+				isMoveSafe["up"] = false
+			}
+		} else if coord.Y == myHead.Y {
+			if coord.X < myHead.X {
+				isMoveSafe["left"] = false
+			} else {
+				isMoveSafe["right"] = false
+			}
+		}
+	}
+
+	// Prevent colliding with other snakes
+	for _, snake := range state.Board.Snakes {
+		for _, coord := range snake.Body {
+			if coord.X == myHead.X {
+				if coord.Y < myHead.Y {
+					isMoveSafe["down"] = false
+				} else {
+					isMoveSafe["up"] = false
+				}
+			} else if coord.Y == myHead.Y {
+				if coord.X < myHead.X {
+					isMoveSafe["left"] = false
+				} else {
+					isMoveSafe["right"] = false
+				}
+			}
+		}
+	}
+
+	safeMoves := []string{}
+	for move, isSafe := range isMoveSafe {
+		if isSafe {
+			safeMoves = append(safeMoves, move)
+		}
+	}
+
+	if len(safeMoves) == 0 {
+		return BattlesnakeMoveResponse{Move: "down"}
+	}
+
+	// Move towards the closest food
+	closestFood := findClosestFood(state.You, state.Board)
+	moveTowardsFood := getMoveTowardsFood(state.You.Head, closestFood)
+
+	chosenMove := safeMoves[0]
+	for _, move := range safeMoves {
+		if move == moveTowardsFood {
+			chosenMove = move
+			break
+		}
+	}
+
+	return BattlesnakeMoveResponse{Move: chosenMove}
+
+}
+
+func findClosestFood(snake Battlesnake, board Board) Coord {
+	closestFood := board.Food[0]
+	minDistance := manhattanDistance(snake.Head, closestFood)
+
+	for _, food := range board.Food {
+		distance := manhattanDistance(snake.Head, food)
+		if distance < minDistance {
+			minDistance = distance
+			closestFood = food
+		}
+	}
+
+	return closestFood
+
+}
+
+func manhattanDistance(a, b Coord) int {
+	return abs(a.X-b.X) + abs(a.Y-b.Y)
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func getMoveTowardsFood(head, food Coord) string {
+	if head.X < food.X {
+		return "right"
+	}
+	if head.X > food.X {
+		return "left"
+	}
+	if head.Y < food.Y {
+		return "up"
+	}
+	if head.Y > food.Y {
+		return "down"
+	}
+	return ""
+
 }

@@ -82,7 +82,7 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	response := domove(state)
+	response := domove2(state)
 
 	h.Headers().Set("Content-Type", "application/json")
 
