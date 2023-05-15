@@ -82,8 +82,8 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	//response := domove6(state)
-	response := MoveStrategyX{NewMoveHelper(16)}.GetMove(state)
+	response := domove6(state)
+	//response := MoveStrategyX{NewMoveHelper(16)}.GetMove(state)
 
 	h.Headers().Set("Content-Type", "application/json")
 

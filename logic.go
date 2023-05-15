@@ -445,7 +445,7 @@ func getPossibleMoves(head Coord) []Coord {
 	}
 }
 
-var lookAheadMoves = 3
+var lookAheadMoves = 8
 
 func domove4(state GameState) BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
