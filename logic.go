@@ -3,6 +3,7 @@ package lib
 import (
 	"crypto/rand"
 	"math/big"
+	"time"
 
 	wrand "github.com/taubyte/go-sdk/crypto/rand"
 )
@@ -332,6 +333,24 @@ func getSafeMoves(state GameState) []string {
 			for _, coord := range myBody {
 				if newHead.X == coord.X && newHead.Y == coord.Y {
 					isSafe = false
+					break
+				}
+			}
+		}
+
+		// Check for opponent collisions
+		if isSafe {
+			for _, snake := range state.Board.Snakes {
+				if snake.ID == state.You.ID {
+					continue
+				}
+				for _, coord := range snake.Body {
+					if newHead.X == coord.X && newHead.Y == coord.Y {
+						isSafe = false
+						break
+					}
+				}
+				if !isSafe {
 					break
 				}
 			}
@@ -678,4 +697,68 @@ func getNextMoveSafetyScoreV2(state GameState, opponentMoves map[string][]Coord)
 	}
 
 	return maxSafetyScore, bestMove
+}
+
+/************************************************/
+
+const maxCalculationTime = 30 * time.Millisecond
+
+func domove6(state GameState) BattlesnakeMoveResponse {
+	myHead := state.You.Body[0]
+	opponentMoves := getAllOpponentMoves(state)
+	var chosenMove string
+	var collisionDetected bool
+	var bestSafetyScore int = -1
+
+	startTime := time.Now()
+
+	for {
+		currentSafetyScore, currentMove := getNextMoveSafetyScoreV2(state, opponentMoves)
+		if currentSafetyScore > bestSafetyScore {
+			bestSafetyScore = currentSafetyScore
+			chosenMove = currentMove
+		}
+
+		newHead := getNewHead(myHead, chosenMove)
+		collisionDetected = false
+
+		// Check for wall collisions
+		if newHead.X < 0 || newHead.Y < 0 || newHead.X >= state.Board.Width || newHead.Y >= state.Board.Height {
+			collisionDetected = true
+		}
+
+		// Check for self-collisions
+		if !collisionDetected {
+			for _, coord := range state.You.Body {
+				if newHead.X == coord.X && newHead.Y == coord.Y {
+					collisionDetected = true
+					break
+				}
+			}
+		}
+
+		// Check for opponent collisions
+		if !collisionDetected {
+			for _, snake := range state.Board.Snakes {
+				if snake.ID == state.You.ID {
+					continue
+				}
+				for _, coord := range snake.Body {
+					if newHead.X == coord.X && newHead.Y == coord.Y {
+						collisionDetected = true
+						break
+					}
+				}
+				if collisionDetected {
+					break
+				}
+			}
+		}
+
+		if !collisionDetected || time.Since(startTime) > maxCalculationTime {
+			break
+		}
+	}
+
+	return BattlesnakeMoveResponse{Move: chosenMove}
 }
