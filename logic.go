@@ -11,10 +11,10 @@ import (
 func info() BattlesnakeInfoResponse {
 	return BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "",           // TODO: Your Battlesnake username
-		Color:      "#099a40",    // TODO: Choose color
-		Head:       "all-seeing", // TODO: Choose head
-		Tail:       "coffee",     // TODO: Choose tail
+		Author:     "",        // TODO: Your Battlesnake username
+		Color:      "#099a40", // TODO: Choose color
+		Head:       "fang",    // TODO: Choose head
+		Tail:       "bolt",    // TODO: Choose tail
 	}
 }
 
