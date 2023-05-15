@@ -287,3 +287,74 @@ func getMoveTowardsFood(head, food Coord) string {
 	return ""
 
 }
+
+func domove3(state GameState) BattlesnakeMoveResponse {
+	// Get safe moves
+	safeMoves := getSafeMoves(state)
+
+	if len(safeMoves) == 0 {
+		return BattlesnakeMoveResponse{Move: "down"}
+	}
+
+	// Move towards the closest food
+	closestFood := findClosestFood(state.You, state.Board)
+	moveTowardsFood := getMoveTowardsFood(state.You.Head, closestFood)
+
+	chosenMove := safeMoves[0]
+	for _, move := range safeMoves {
+		if move == moveTowardsFood {
+			chosenMove = move
+			break
+		}
+	}
+
+	return BattlesnakeMoveResponse{Move: chosenMove}
+}
+
+func getSafeMoves(state GameState) []string {
+	myHead := state.You.Body[0]
+	boardWidth := state.Board.Width
+	boardHeight := state.Board.Height
+
+	possibleMoves := []string{"up", "down", "left", "right"}
+	safeMoves := make([]string, 0)
+
+	for _, move := range possibleMoves {
+		newHead := getNewHead(myHead, move)
+		if !isOutOfBoard(boardWidth, boardHeight, newHead) && !isSnakeCollision(state.Board, newHead) {
+			safeMoves = append(safeMoves, move)
+		}
+	}
+
+	return safeMoves
+}
+
+func isOutOfBoard(width, height int, coord Coord) bool {
+	return coord.X < 0 || coord.X >= width || coord.Y < 0 || coord.Y >= height
+}
+
+func isSnakeCollision(board Board, coord Coord) bool {
+	for _, snake := range board.Snakes {
+		for _, snakeBody := range snake.Body {
+			if coord.X == snakeBody.X && coord.Y == snakeBody.Y {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func getNewHead(head Coord, move string) Coord {
+	newHead := Coord{X: head.X, Y: head.Y}
+	switch move {
+	case "up":
+		newHead.Y++
+	case "down":
+		newHead.Y--
+	case "left":
+		newHead.X--
+	case "right":
+		newHead.X++
+	}
+	return newHead
+}
