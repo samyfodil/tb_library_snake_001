@@ -569,3 +569,113 @@ func getNextMoveSafetyScore(state GameState, opponentMoves map[string][]Coord) (
 
 	return maxSafetyScore, bestMove
 }
+
+/**************************************************************/
+
+// Move function
+func domove5(state GameState) BattlesnakeMoveResponse {
+	opponentMoves := getAllOpponentMoves(state)
+	safetyScore, chosenMove := getNextMoveSafetyScoreV2(state, opponentMoves)
+
+	// Reduce lookAheadMoves until a move is found
+	for safetyScore == -1 && lookAheadMoves > 0 {
+		lookAheadMoves--
+		safetyScore, chosenMove = getNextMoveSafetyScoreV2(state, opponentMoves)
+	}
+
+	// If no safe move is found, choose a random move from all possible moves
+	if safetyScore == -1 {
+		possibleMoves := []string{"up", "down", "left", "right"}
+		i, _ := rand.Int(rand.Reader, big.NewInt(int64(len(possibleMoves))))
+		chosenMove = possibleMoves[i.Int64()]
+	}
+
+	return BattlesnakeMoveResponse{Move: chosenMove}
+}
+
+func simulateMoveV2(state GameState, move string, lookAheadMoves int) GameState {
+	if lookAheadMoves <= 0 {
+		return state
+	}
+
+	simulatedState := deepCopyGameState(state)
+	newHead := getNewHead(simulatedState.You.Body[0], move)
+	simulatedState.You.Body = append([]Coord{newHead}, simulatedState.You.Body[:len(simulatedState.You.Body)-1]...)
+
+	// Recursively simulate moves
+	opponentMoves := getAllOpponentMoves(simulatedState)
+	for _, moves := range opponentMoves {
+		for _, coord := range moves {
+			m := getDirection(simulatedState.You.Body[0], coord)
+			simulateMoveV2(simulatedState, m, lookAheadMoves-1)
+		}
+	}
+
+	return simulatedState
+}
+
+func getDirection(currentHead, newHead Coord) string {
+	if newHead.X < currentHead.X {
+		return "left"
+	} else if newHead.X > currentHead.X {
+		return "right"
+	} else if newHead.Y < currentHead.Y {
+		return "down"
+	} else {
+		return "up"
+	}
+}
+
+// getNextMoveSafetyScoreV2 function
+func getNextMoveSafetyScoreV2(state GameState, opponentMoves map[string][]Coord) (int, string) {
+	myHead := state.You.Body[0]
+	safeMoves := getSafeMoves(state)
+
+	safetyScores := make(map[string]int)
+
+	for _, move := range safeMoves {
+		newHead := getNewHead(myHead, move)
+		isSafe := true
+
+		for _, opponentMoveSet := range opponentMoves {
+			for _, opponentMove := range opponentMoveSet {
+				if newHead.X == opponentMove.X && newHead.Y == opponentMove.Y {
+					isSafe = false
+					break
+				}
+			}
+			if !isSafe {
+				break
+			}
+		}
+
+		if isSafe {
+			simulatedState := simulateMoveV2(state, move, lookAheadMoves-1)
+			opponentSimulatedMoves := getAllOpponentMoves(simulatedState)
+			safetyScore, _ := getNextMoveSafetyScore(simulatedState, opponentSimulatedMoves)
+			safetyScores[move] = safetyScore + 1
+		} else {
+			safetyScores[move] = 0
+		}
+	}
+
+	maxSafetyScore := -1
+	bestMove := ""
+
+	for move, score := range safetyScores {
+		if score > maxSafetyScore {
+			maxSafetyScore = score
+			bestMove = move
+		} else if score == maxSafetyScore {
+			// Generate a random number using the provided method
+			i, _ := rand.Int(rand.Reader, big.NewInt(2))
+
+			// If the random number is 0, update the bestMove
+			if i.Int64() == 0 {
+				bestMove = move
+			}
+		}
+	}
+
+	return maxSafetyScore, bestMove
+}
