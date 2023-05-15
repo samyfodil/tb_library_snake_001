@@ -95,6 +95,8 @@ func move(e event.Event) uint32 {
 
 	h.Write(data)
 
+	h.Return(200)
+
 	return 0
 }
 
