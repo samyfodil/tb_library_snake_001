@@ -82,7 +82,7 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	response := domove6(state)
+	response := domove5(state)
 	//response := MoveStrategyX{NewMoveHelper(16)}.GetMove(state)
 
 	h.Headers().Set("Content-Type", "application/json")
