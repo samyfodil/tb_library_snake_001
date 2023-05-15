@@ -313,15 +313,31 @@ func domove3(state GameState) BattlesnakeMoveResponse {
 
 func getSafeMoves(state GameState) []string {
 	myHead := state.You.Body[0]
-	boardWidth := state.Board.Width
-	boardHeight := state.Board.Height
+	myBody := state.You.Body[1:]
 
 	possibleMoves := []string{"up", "down", "left", "right"}
-	safeMoves := make([]string, 0)
+	safeMoves := []string{}
 
 	for _, move := range possibleMoves {
 		newHead := getNewHead(myHead, move)
-		if !isOutOfBoard(boardWidth, boardHeight, newHead) && !isSnakeCollision(state.Board, newHead) {
+		isSafe := true
+
+		// Check for wall collisions
+		if newHead.X < 0 || newHead.Y < 0 || newHead.X >= state.Board.Width || newHead.Y >= state.Board.Height {
+			isSafe = false
+		}
+
+		// Check for self-collisions
+		if isSafe {
+			for _, coord := range myBody {
+				if newHead.X == coord.X && newHead.Y == coord.Y {
+					isSafe = false
+					break
+				}
+			}
+		}
+
+		if isSafe {
 			safeMoves = append(safeMoves, move)
 		}
 	}
@@ -409,6 +425,8 @@ func getPossibleMoves(head Coord) []Coord {
 		{X: head.X - 1, Y: head.Y},
 	}
 }
+
+var lookAheadMoves = 3
 
 func domove4(state GameState) BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
