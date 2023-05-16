@@ -1,6 +1,9 @@
 package lib
 
 import (
+	"function/types"
+	v1 "function/v1"
+	v2 "function/v2"
 	"io"
 
 	"github.com/taubyte/go-sdk/event"
@@ -42,7 +45,7 @@ func start(e event.Event) uint32 {
 
 	h.Headers().Set("Server", ServerID)
 
-	state := GameState{}
+	state := types.GameState{}
 
 	data, err := io.ReadAll(h.Body())
 	if err != nil {
@@ -68,7 +71,7 @@ func move(e event.Event) uint32 {
 
 	h.Headers().Set("Server", ServerID)
 
-	state := GameState{}
+	state := types.GameState{}
 
 	data, err := io.ReadAll(h.Body())
 	if err != nil {
@@ -82,23 +85,23 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	response := BattlesnakeMoveResponse{
+	response := types.BattlesnakeMoveResponse{
 		Move: "down",
 	}
 
 	switch state.You.Name {
 	case "tau001":
-		response = domove(state)
+		response = v1.Domove(state)
 	case "tau002":
-		response = domove2(state)
+		response = v1.Domove2(state)
 	case "tau003":
-		response = domove3(state)
+		response = v1.Domove3(state)
 	case "tau004":
-		response = domove4(state)
+		response = v1.Domove4(state)
 	case "tau005":
-		response = domove5(state)
-		// case "tau006":
-		// 	response = NewMoveStrategyY().GetMove(state)
+		response = v1.Domove5(state)
+	case "tau006":
+		response = v2.Move(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")
@@ -125,7 +128,7 @@ func end(e event.Event) uint32 {
 
 	h.Headers().Set("Server", ServerID)
 
-	state := GameState{}
+	state := types.GameState{}
 
 	data, err := io.ReadAll(h.Body())
 	if err != nil {

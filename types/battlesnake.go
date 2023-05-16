@@ -1,4 +1,4 @@
-package lib
+package types
 
 //go:generate go get github.com/mailru/easyjson
 //go:generate go install github.com/mailru/easyjson/...@latest

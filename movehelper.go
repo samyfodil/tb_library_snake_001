@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"function/types"
 	"math"
 	"math/rand"
 	"time"
@@ -8,11 +9,11 @@ import (
 
 type MoveHelper struct{}
 
-func (mh MoveHelper) isOutOfBounds(point Coord, width int, height int) bool {
+func (mh MoveHelper) isOutOfBounds(point types.Coord, width int, height int) bool {
 	return point.X < 0 || point.Y < 0 || point.X >= width || point.Y >= height
 }
 
-func (mh MoveHelper) isBodyCollision(point Coord, body []Coord) bool {
+func (mh MoveHelper) isBodyCollision(point types.Coord, body []types.Coord) bool {
 	for _, bodyPart := range body {
 		if point.X == bodyPart.X && point.Y == bodyPart.Y {
 			return true
@@ -21,7 +22,7 @@ func (mh MoveHelper) isBodyCollision(point Coord, body []Coord) bool {
 	return false
 }
 
-func (mh MoveHelper) getAllowedMoves(state GameState) []string {
+func (mh MoveHelper) getAllowedMoves(state types.GameState) []string {
 	allowedMoves := []string{"up", "down", "left", "right"}
 
 	head := state.You.Body[0]
@@ -38,7 +39,7 @@ func (mh MoveHelper) getAllowedMoves(state GameState) []string {
 	return allowedMoves
 }
 
-func (mh MoveHelper) getNewHead(head Coord, move string) Coord {
+func (mh MoveHelper) getNewHead(head types.Coord, move string) types.Coord {
 	newHead := head
 	switch move {
 	case "up":
@@ -69,7 +70,7 @@ func (mh MoveHelper) remove(slice []string, s string) []string {
 	return slice
 }
 
-func (mh MoveHelper) euclideanDistance(a Coord, b Coord) float64 {
+func (mh MoveHelper) euclideanDistance(a types.Coord, b types.Coord) float64 {
 	dx := float64(a.X - b.X)
 	dy := float64(a.Y - b.Y)
 	return math.Sqrt(dx*dx + dy*dy)
@@ -80,21 +81,21 @@ func (mh MoveHelper) randFloat() float64 {
 	return rand.Float64()
 }
 
-func (mh MoveHelper) isMoveSafe(state GameState, move string) bool {
+func (mh MoveHelper) isMoveSafe(state types.GameState, move string) bool {
 	newHead := mh.getNewHead(state.You.Body[0], move)
 	return mh.isInBounds(newHead, state.Board) && !mh.isCollidingWithSelf(newHead, state.You.Body)
 }
 
-func (mh MoveHelper) getCollisionScore(state GameState, move string) int {
+func (mh MoveHelper) getCollisionScore(state types.GameState, move string) int {
 	newHead := mh.getNewHead(state.You.Body[0], move)
 	return mh.distanceToClosestCollision(newHead, state.Board)
 }
 
-func (mh MoveHelper) isInBounds(coord Coord, board Board) bool {
+func (mh MoveHelper) isInBounds(coord types.Coord, board types.Board) bool {
 	return coord.X >= 0 && coord.X < board.Width && coord.Y >= 0 && coord.Y < board.Height
 }
 
-func (mh MoveHelper) isCollidingWithSelf(newHead Coord, body []Coord) bool {
+func (mh MoveHelper) isCollidingWithSelf(newHead types.Coord, body []types.Coord) bool {
 	for _, bodyPart := range body {
 		if newHead.X == bodyPart.X && newHead.Y == bodyPart.Y {
 			return true
@@ -103,7 +104,7 @@ func (mh MoveHelper) isCollidingWithSelf(newHead Coord, body []Coord) bool {
 	return false
 }
 
-func (mh MoveHelper) updateGameStateForMove(board Board, you Battlesnake, newHead Coord) (Board, Battlesnake) {
+func (mh MoveHelper) updateGameStateForMove(board types.Board, you types.Battlesnake, newHead types.Coord) (types.Board, types.Battlesnake) {
 	updatedBoard := board
 	updatedSnake := you
 
@@ -119,9 +120,9 @@ func (mh MoveHelper) updateGameStateForMove(board Board, you Battlesnake, newHea
 
 	// Update the snake's body
 	if consumedFood {
-		updatedSnake.Body = append([]Coord{newHead}, updatedSnake.Body...)
+		updatedSnake.Body = append([]types.Coord{newHead}, updatedSnake.Body...)
 	} else {
-		updatedSnake.Body = append([]Coord{newHead}, updatedSnake.Body[:len(updatedSnake.Body)-1]...)
+		updatedSnake.Body = append([]types.Coord{newHead}, updatedSnake.Body[:len(updatedSnake.Body)-1]...)
 	}
 
 	// Update the snake's health
@@ -134,7 +135,7 @@ func (mh MoveHelper) updateGameStateForMove(board Board, you Battlesnake, newHea
 	return updatedBoard, updatedSnake
 }
 
-func (mh MoveHelper) distanceToClosestFood(coord Coord, food []Coord) int {
+func (mh MoveHelper) distanceToClosestFood(coord types.Coord, food []types.Coord) int {
 	minDist := math.MaxInt32
 	for _, foodCoord := range food {
 		dist := mh.manhattanDistance(coord, foodCoord)
@@ -145,7 +146,7 @@ func (mh MoveHelper) distanceToClosestFood(coord Coord, food []Coord) int {
 	return minDist
 }
 
-func (mh MoveHelper) distanceToClosestCollision(coord Coord, board Board) int {
+func (mh MoveHelper) distanceToClosestCollision(coord types.Coord, board types.Board) int {
 	minDist := math.MaxInt32
 	for _, snake := range board.Snakes {
 		for _, bodyCoord := range snake.Body {
@@ -158,29 +159,29 @@ func (mh MoveHelper) distanceToClosestCollision(coord Coord, board Board) int {
 	return minDist
 }
 
-func (mh MoveHelper) DeepCopy(state GameState) GameState {
-	copiedState := GameState{}
+func (mh MoveHelper) DeepCopy(state types.GameState) types.GameState {
+	copiedState := types.GameState{}
 	copiedState.Turn = state.Turn
 	copiedState.You = state.You
 	copiedState.Board.Width = state.Board.Width
 	copiedState.Board.Height = state.Board.Height
-	copiedState.Board.Food = make([]Coord, len(state.Board.Food))
+	copiedState.Board.Food = make([]types.Coord, len(state.Board.Food))
 	copy(copiedState.Board.Food, state.Board.Food)
-	copiedState.Board.Hazards = make([]Coord, len(state.Board.Hazards))
+	copiedState.Board.Hazards = make([]types.Coord, len(state.Board.Hazards))
 	copy(copiedState.Board.Hazards, state.Board.Hazards)
-	copiedState.Board.Snakes = make([]Battlesnake, len(state.Board.Snakes))
+	copiedState.Board.Snakes = make([]types.Battlesnake, len(state.Board.Snakes))
 	for i, snake := range state.Board.Snakes {
-		copiedState.Board.Snakes[i] = Battlesnake{
+		copiedState.Board.Snakes[i] = types.Battlesnake{
 			ID:     snake.ID,
 			Name:   snake.Name,
 			Health: snake.Health,
-			Body:   make([]Coord, len(snake.Body)),
+			Body:   make([]types.Coord, len(snake.Body)),
 		}
 		copy(copiedState.Board.Snakes[i].Body, snake.Body)
 	}
 	return copiedState
 }
 
-func (mh MoveHelper) manhattanDistance(a, b Coord) int {
+func (mh MoveHelper) manhattanDistance(a, b types.Coord) int {
 	return int(math.Abs(float64(a.X-b.X)) + math.Abs(float64(a.Y-b.Y)))
 }

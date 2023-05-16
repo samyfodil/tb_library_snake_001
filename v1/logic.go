@@ -1,13 +1,14 @@
-package lib
+package v1
 
 import (
+	"function/types"
 	"time"
 )
 
-func info() BattlesnakeInfoResponse {
-	return BattlesnakeInfoResponse{
+func info() types.BattlesnakeInfoResponse {
+	return types.BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "",        // TODO: Your Battlesnake username
+		Author:     "",        // TODO: Your types.Battlesnake username
 		Color:      "#099a40", // TODO: Choose color
 		Head:       "fang",    // TODO: Choose head
 		Tail:       "bolt",    // TODO: Choose tail
@@ -17,7 +18,7 @@ func info() BattlesnakeInfoResponse {
 // move is called on every turn and returns your next move
 // Valid moves are "up", "down", "left", or "right"
 // See https://docs.battlesnake.com/api/example-move for available data
-func domove(state GameState) BattlesnakeMoveResponse {
+func Domove(state types.GameState) types.BattlesnakeMoveResponse {
 
 	isMoveSafe := map[string]bool{
 		"up":    true,
@@ -26,9 +27,9 @@ func domove(state GameState) BattlesnakeMoveResponse {
 		"right": true,
 	}
 
-	myHead := state.You.Body[0] // Coordinates of your head
+	myHead := state.You.Body[0] // types.Coordinates of your head
 
-	// Prevent your Battlesnake from moving out of bounds
+	// Prevent your types.Battlesnake from moving out of bounds
 	boardWidth := state.Board.Width
 
 	if myHead.X == boardWidth-1 {
@@ -45,7 +46,7 @@ func domove(state GameState) BattlesnakeMoveResponse {
 		isMoveSafe["up"] = false
 	}
 
-	// Prevent your Battlesnake from colliding with itself
+	// Prevent your types.Battlesnake from colliding with itself
 	for _, cor := range state.You.Body[1:] /*skip head*/ {
 		x, y := cor.X, cor.Y
 
@@ -62,7 +63,7 @@ func domove(state GameState) BattlesnakeMoveResponse {
 		}
 	}
 
-	// Prevent your Battlesnake from colliding with other Battlesnakes
+	// Prevent your types.Battlesnake from colliding with other types.Battlesnakes
 	for _, snk := range state.Board.Snakes {
 		for _, cor := range snk.Body {
 			x, y := cor.X, cor.Y
@@ -134,10 +135,10 @@ func domove(state GameState) BattlesnakeMoveResponse {
 		nextMove = "down"
 	}
 
-	return BattlesnakeMoveResponse{Move: nextMove}
+	return types.BattlesnakeMoveResponse{Move: nextMove}
 }
 
-func domove2(state GameState) BattlesnakeMoveResponse {
+func Domove2(state types.GameState) types.BattlesnakeMoveResponse {
 
 	isMoveSafe := map[string]bool{
 		"up":    true,
@@ -221,7 +222,7 @@ func domove2(state GameState) BattlesnakeMoveResponse {
 	}
 
 	if len(safeMoves) == 0 {
-		return BattlesnakeMoveResponse{Move: "down"}
+		return types.BattlesnakeMoveResponse{Move: "down"}
 	}
 
 	// Move towards the closest food
@@ -236,11 +237,11 @@ func domove2(state GameState) BattlesnakeMoveResponse {
 		}
 	}
 
-	return BattlesnakeMoveResponse{Move: chosenMove}
+	return types.BattlesnakeMoveResponse{Move: chosenMove}
 
 }
 
-func findClosestFood(snake Battlesnake, board Board) Coord {
+func findClosestFood(snake types.Battlesnake, board types.Board) types.Coord {
 	closestFood := board.Food[0]
 	minDistance := manhattanDistance(snake.Head, closestFood)
 
@@ -256,7 +257,7 @@ func findClosestFood(snake Battlesnake, board Board) Coord {
 
 }
 
-func manhattanDistance(a, b Coord) int {
+func manhattanDistance(a, b types.Coord) int {
 	return abs(a.X-b.X) + abs(a.Y-b.Y)
 }
 
@@ -267,7 +268,7 @@ func abs(x int) int {
 	return x
 }
 
-func getMoveTowardsFood(head, food Coord) string {
+func getMoveTowardsFood(head, food types.Coord) string {
 	if head.X < food.X {
 		return "right"
 	}
@@ -284,12 +285,12 @@ func getMoveTowardsFood(head, food Coord) string {
 
 }
 
-func domove3(state GameState) BattlesnakeMoveResponse {
+func Domove3(state types.GameState) types.BattlesnakeMoveResponse {
 	// Get safe moves
 	safeMoves := getSafeMoves(state)
 
 	if len(safeMoves) == 0 {
-		return BattlesnakeMoveResponse{Move: "down"}
+		return types.BattlesnakeMoveResponse{Move: "down"}
 	}
 
 	// Move towards the closest food
@@ -304,10 +305,10 @@ func domove3(state GameState) BattlesnakeMoveResponse {
 		}
 	}
 
-	return BattlesnakeMoveResponse{Move: chosenMove}
+	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func getSafeMoves(state GameState) []string {
+func getSafeMoves(state types.GameState) []string {
 	myHead := state.You.Body[0]
 	myBody := state.You.Body[1:]
 
@@ -359,11 +360,11 @@ func getSafeMoves(state GameState) []string {
 	return safeMoves
 }
 
-func isOutOfBoard(width, height int, coord Coord) bool {
+func isOutOfBoard(width, height int, coord types.Coord) bool {
 	return coord.X < 0 || coord.X >= width || coord.Y < 0 || coord.Y >= height
 }
 
-func isSnakeCollision(board Board, coord Coord) bool {
+func isSnakeCollision(board types.Board, coord types.Coord) bool {
 	for _, snake := range board.Snakes {
 		for _, snakeBody := range snake.Body {
 			if coord.X == snakeBody.X && coord.Y == snakeBody.Y {
@@ -374,8 +375,8 @@ func isSnakeCollision(board Board, coord Coord) bool {
 	return false
 }
 
-func getNewHead(head Coord, move string) Coord {
-	newHead := Coord{X: head.X, Y: head.Y}
+func getNewHead(head types.Coord, move string) types.Coord {
+	newHead := types.Coord{X: head.X, Y: head.Y}
 	switch move {
 	case "up":
 		newHead.Y++
@@ -391,7 +392,7 @@ func getNewHead(head Coord, move string) Coord {
 
 /******************************/
 
-func getSafeMovesFromOpponents(myHead Coord, safeMoves []string, opponentMoves map[string][]Coord) []string {
+func getSafeMovesFromOpponents(myHead types.Coord, safeMoves []string, opponentMoves map[string][]types.Coord) []string {
 	safestMoves := make([]string, 0)
 
 	for _, move := range safeMoves {
@@ -418,8 +419,8 @@ func getSafeMovesFromOpponents(myHead Coord, safeMoves []string, opponentMoves m
 	return safestMoves
 }
 
-func getAllOpponentMoves(state GameState) map[string][]Coord {
-	opponentMoves := make(map[string][]Coord)
+func getAllOpponentMoves(state types.GameState) map[string][]types.Coord {
+	opponentMoves := make(map[string][]types.Coord)
 
 	for _, snake := range state.Board.Snakes {
 		if snake.ID != state.You.ID {
@@ -431,8 +432,8 @@ func getAllOpponentMoves(state GameState) map[string][]Coord {
 	return opponentMoves
 }
 
-func getPossibleMoves(head Coord) []Coord {
-	return []Coord{
+func getPossibleMoves(head types.Coord) []types.Coord {
+	return []types.Coord{
 		{X: head.X, Y: head.Y + 1},
 		{X: head.X, Y: head.Y - 1},
 		{X: head.X + 1, Y: head.Y},
@@ -442,14 +443,14 @@ func getPossibleMoves(head Coord) []Coord {
 
 var lookAheadMoves = 8
 
-func domove4(state GameState) BattlesnakeMoveResponse {
+func Domove4(state types.GameState) types.BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
 
 	// Get safe moves
 	safeMoves := getSafeMoves(state)
 
 	if len(safeMoves) == 0 {
-		return BattlesnakeMoveResponse{Move: "down"}
+		return types.BattlesnakeMoveResponse{Move: "down"}
 	}
 
 	// Get the positions of all possible moves for each opponent snake
@@ -494,18 +495,18 @@ func domove4(state GameState) BattlesnakeMoveResponse {
 		chosenMove = safestNextMoves[0]
 	}
 
-	return BattlesnakeMoveResponse{Move: chosenMove}
+	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func deepCopyGameState(original GameState) GameState {
-	copied := GameState{
+func deepCopyGameState(original types.GameState) types.GameState {
+	copied := types.GameState{
 		Game: original.Game,
 		Turn: original.Turn,
-		Board: Board{
+		Board: types.Board{
 			Height: original.Board.Height,
 			Width:  original.Board.Width,
-			Food:   make([]Coord, len(original.Board.Food)),
-			Snakes: make([]Battlesnake, len(original.Board.Snakes)),
+			Food:   make([]types.Coord, len(original.Board.Food)),
+			Snakes: make([]types.Battlesnake, len(original.Board.Snakes)),
 		},
 		You: original.You,
 	}
@@ -513,11 +514,11 @@ func deepCopyGameState(original GameState) GameState {
 	copy(copied.Board.Food, original.Board.Food)
 
 	for i, snake := range original.Board.Snakes {
-		copiedSnake := Battlesnake{
+		copiedSnake := types.Battlesnake{
 			ID:     snake.ID,
 			Name:   snake.Name,
 			Health: snake.Health,
-			Body:   make([]Coord, len(snake.Body)),
+			Body:   make([]types.Coord, len(snake.Body)),
 		}
 		copy(copiedSnake.Body, snake.Body)
 		copied.Board.Snakes[i] = copiedSnake
@@ -526,14 +527,14 @@ func deepCopyGameState(original GameState) GameState {
 	return copied
 }
 
-func simulateMove(state GameState, move string) GameState {
+func simulateMove(state types.GameState, move string) types.GameState {
 	simulatedState := deepCopyGameState(state)
 	newHead := getNewHead(simulatedState.You.Body[0], move)
-	simulatedState.You.Body = append([]Coord{newHead}, simulatedState.You.Body...)
+	simulatedState.You.Body = append([]types.Coord{newHead}, simulatedState.You.Body...)
 	return simulatedState
 }
 
-func getNextMoveSafetyScore(state GameState, opponentMoves map[string][]Coord) (int, string) {
+func getNextMoveSafetyScore(state types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
 	myHead := state.You.Body[0]
 	safeMoves := getSafeMoves(state)
 
@@ -583,7 +584,7 @@ func getNextMoveSafetyScore(state GameState, opponentMoves map[string][]Coord) (
 /**************************************************************/
 
 // Move function
-func domove5(state GameState) BattlesnakeMoveResponse {
+func Domove5(state types.GameState) types.BattlesnakeMoveResponse {
 	opponentMoves := getAllOpponentMoves(state)
 	safetyScore, chosenMove := getNextMoveSafetyScoreV2(state, opponentMoves)
 
@@ -599,17 +600,17 @@ func domove5(state GameState) BattlesnakeMoveResponse {
 		chosenMove = possibleMoves[int(time.Now().Unix())%len(possibleMoves)]
 	}
 
-	return BattlesnakeMoveResponse{Move: chosenMove}
+	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func simulateMoveV2(state GameState, move string, lookAheadMoves int) GameState {
+func simulateMoveV2(state types.GameState, move string, lookAheadMoves int) types.GameState {
 	if lookAheadMoves <= 0 {
 		return state
 	}
 
 	simulatedState := deepCopyGameState(state)
 	newHead := getNewHead(simulatedState.You.Body[0], move)
-	simulatedState.You.Body = append([]Coord{newHead}, simulatedState.You.Body[:len(simulatedState.You.Body)-1]...)
+	simulatedState.You.Body = append([]types.Coord{newHead}, simulatedState.You.Body[:len(simulatedState.You.Body)-1]...)
 
 	// Recursively simulate moves
 	opponentMoves := getAllOpponentMoves(simulatedState)
@@ -623,7 +624,7 @@ func simulateMoveV2(state GameState, move string, lookAheadMoves int) GameState 
 	return simulatedState
 }
 
-func getDirection(currentHead, newHead Coord) string {
+func getDirection(currentHead, newHead types.Coord) string {
 	if newHead.X < currentHead.X {
 		return "left"
 	} else if newHead.X > currentHead.X {
@@ -636,7 +637,7 @@ func getDirection(currentHead, newHead Coord) string {
 }
 
 // getNextMoveSafetyScoreV2 function
-func getNextMoveSafetyScoreV2(state GameState, opponentMoves map[string][]Coord) (int, string) {
+func getNextMoveSafetyScoreV2(state types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
 	myHead := state.You.Body[0]
 	safeMoves := getSafeMoves(state)
 
@@ -690,7 +691,7 @@ func getNextMoveSafetyScoreV2(state GameState, opponentMoves map[string][]Coord)
 
 const maxCalculationTime = 30 * time.Millisecond
 
-func domove6(state GameState) BattlesnakeMoveResponse {
+func Domove6(state types.GameState) types.BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
 	opponentMoves := getAllOpponentMoves(state)
 	var chosenMove string
@@ -747,5 +748,5 @@ func domove6(state GameState) BattlesnakeMoveResponse {
 		}
 	}
 
-	return BattlesnakeMoveResponse{Move: chosenMove}
+	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
