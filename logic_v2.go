@@ -7,7 +7,7 @@ import (
 
 const (
 	DefaultLookAheadTurns = 3
-	DefaultSimulateStuck  = 0.3 // 10% chance of getting stuck
+	DefaultSimulateStuck  = 0.7 // 10% chance of getting stuck
 )
 
 type MoveStrategyY struct {
