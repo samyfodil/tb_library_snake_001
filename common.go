@@ -1,4 +1,4 @@
-package lib
+package main
 
 import (
 	"github.com/samyfodil/tb_library_snake_001/types"
