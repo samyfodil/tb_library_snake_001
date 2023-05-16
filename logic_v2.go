@@ -2,209 +2,189 @@ package lib
 
 import (
 	"math"
-	"math/rand"
 	"sort"
 )
 
-type MoveStrategy interface {
-	GetMove(state GameState) BattlesnakeMoveResponse
-}
+const (
+	DefaultLookAheadTurns = 3
+	DefaultSimulateStuck  = 0.3 // 10% chance of getting stuck
+)
 
-type MoveStrategyX struct {
+type MoveStrategyY struct {
 	MoveHelper
+	LookAheadTurns int
+	SimulateStuck  float64
 }
 
-func (ms MoveStrategyX) GetMove(state GameState) BattlesnakeMoveResponse {
-	movesWithScores := make([]moveScore, 0, len(ms.possibleMoves))
+func NewMoveStrategyY() MoveStrategyY {
+	return MoveStrategyY{
+		MoveHelper:     MoveHelper{},
+		LookAheadTurns: DefaultLookAheadTurns,
+		SimulateStuck:  DefaultSimulateStuck,
+	}
+}
 
-	for _, move := range ms.possibleMoves {
-		score := ms.getNextMoveSafetyScore(state, move, ms.lookAheadMoves)
-		movesWithScores = append(movesWithScores, moveScore{Move: move, Score: score})
+func (ms MoveStrategyY) GetMove(state GameState) BattlesnakeMoveResponse {
+	safeMoves := []string{}
+
+	for _, move := range ms.getAllowedMoves(state) {
+		if ms.isMoveSafe(state, move) {
+			safeMoves = append(safeMoves, move)
+		}
 	}
 
-	ms.randomizeMoves(movesWithScores)
-	ms.sortMovesByScore(movesWithScores)
+	if len(safeMoves) == 0 {
+		// No safe moves detected, loop over self
+		safeMoves = ms.loopOverSelf(state)
+	}
 
-	chosenMove := movesWithScores[0].Move
+	// Calculate scores for each move based on the requirements
+	moveScores := make(map[string]float64)
+	for _, move := range safeMoves {
+		moveScores[move] = ms.calculateMoveScoreY(state, move)
+	}
+
+	// Sort the safe moves based on their scores
+	sort.SliceStable(safeMoves, func(i, j int) bool {
+		return moveScores[safeMoves[i]] > moveScores[safeMoves[j]]
+	})
+
+	// Choose the move with the highest score
+	chosenMove := safeMoves[0]
 
 	return BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-type moveScore struct {
-	Move  string
-	Score int
-}
+func (ms MoveStrategyY) calculateMoveScoreY(state GameState, move string) float64 {
+	newState := ms.simulateMove(state, move, ms.LookAheadTurns, ms.SimulateStuck)
+	score := 0.0
 
-type MoveHelper struct {
-	possibleMoves  []string
-	lookAheadMoves int
-}
+	// Encourage pushing other snakes to hit bounds
+	score += ms.getBoundaryPushScore(state)
 
-func NewMoveHelper(lookAheadMoves int) MoveHelper {
-	return MoveHelper{
-		possibleMoves:  []string{"up", "down", "left", "right"},
-		lookAheadMoves: lookAheadMoves,
-	}
-}
-
-func (mh MoveHelper) getNextMoveSafetyScore(state GameState, move string, lookAheadMoves int) int {
-	score := 0
-
-	newHead := mh.getNewHead(state.You.Body[0], move)
-
-	if mh.isOutOfBounds(newHead, state.Board.Width, state.Board.Height) {
-		return math.MinInt32
+	// Discourage getting food unless necessary
+	if state.You.Health < 60 {
+		score += float64(ms.getFoodScore(state, newState))
 	}
 
-	if mh.isCollidingWithSnakes(newHead, state.Board.Snakes) {
-		collidingSnake := mh.isHeadToHeadCollision(newHead, state.Board.Snakes)
-		if collidingSnake == nil || len(state.You.Body) <= len(collidingSnake.Body) {
-			return math.MinInt32
-		}
-		score += 1000 // Increase the score for colliding with a smaller snake's head
-	}
-
-	if lookAheadMoves > 0 {
-		for _, m := range mh.possibleMoves {
-			simulatedState := mh.simulateMove(state, move, lookAheadMoves-1)
-			score += mh.getNextMoveSafetyScore(simulatedState, m, lookAheadMoves-1)
-		}
-	}
-
-	score += mh.getAreaControlScore(state, move)
+	// Avoid hitting other snakes
+	score -= ms.getCollisionScore(newState)
 
 	return score
 }
 
-// Helper methods
-
-func (mh MoveHelper) getNewHead(head Coord, move string) Coord {
-	newHead := head
-	switch move {
-	case "up":
-		newHead.Y++
-	case "down":
-		newHead.Y--
-	case "left":
-		newHead.X--
-	case "right":
-		newHead.X++
-	}
-	return newHead
-}
-
-func (mh MoveHelper) isOutOfBounds(coord Coord, width, height int) bool {
-	return coord.X < 0 || coord.Y < 0 || coord.X >= width || coord.Y >= height
-}
-
-func (mh MoveHelper) isCollidingWithSnakes(coord Coord, snakes []Battlesnake) bool {
-	for _, snake := range snakes {
-		for _, snakeCoord := range snake.Body {
-			if coord.X == snakeCoord.X && coord.Y == snakeCoord.Y {
-				return true
-			}
+func (ms MoveStrategyY) isCollidingWithSnake(head Coord, snakeBody []Coord) bool {
+	for _, bodyPart := range snakeBody {
+		if head.X == bodyPart.X && head.Y == bodyPart.Y {
+			return true
 		}
 	}
 	return false
 }
 
-func (mh MoveHelper) isHeadToHeadCollision(coord Coord, snakes []Battlesnake) *Battlesnake {
-	for _, snake := range snakes {
-		if coord.X == snake.Head.X && coord.Y == snake.Head.Y {
-			return &snake
+func (ms MoveStrategyY) getCollisionScore(newState GameState) float64 {
+	collisionScore := 0.0
+
+	for _, snake := range newState.Board.Snakes {
+		if snake.ID == newState.You.ID {
+			continue
+		}
+
+		if ms.isCollidingWithSnake(newState.You.Body[0], snake.Body) {
+			collisionScore += 100.0
 		}
 	}
-	return nil
+
+	return collisionScore
 }
 
-func (mh MoveHelper) simulateMove(state GameState, move string, lookAheadMoves int) GameState {
-	simulatedState := state.deepcopy()
-	newHead := mh.getNewHead(simulatedState.You.Body[0], move)
-	simulatedState.You.Body = append([]Coord{newHead}, simulatedState.You.Body[:len(simulatedState.You.Body)-1]...)
+// func (ms MoveStrategyY) getCollisionScore(newState GameState) float64 {
+// 	collisionScore := 0.0
 
-	return simulatedState
+// 	for _, snake := range newState.Board.Snakes {
+// 		if snake.ID == newState.You.ID {
+// 			continue
+// 		}
+
+// 		if ms.isCollidingWithSnake(newState.You.Body[0], snake.Body) {
+// 			collisionScore += 100.0
+// 		}
+// 	}
+
+// 	return collisionScore
+// }
+
+func (ms MoveStrategyY) getFoodScore(oldState, newState GameState) int {
+	oldDist := ms.distanceToClosestFood(oldState.You.Body[0], oldState.Board.Food)
+	newDist := ms.distanceToClosestFood(newState.You.Body[0], newState.Board.Food)
+
+	if newDist < oldDist {
+		return -1
+	}
+
+	return 0
 }
 
-func (mh MoveHelper) randomizeMoves(movesWithScores []moveScore) {
-	rand.Shuffle(len(movesWithScores), func(i, j int) {
-		movesWithScores[i], movesWithScores[j] = movesWithScores[j], movesWithScores[i]
-	})
-}
+func (ms MoveStrategyY) loopOverSelf(state GameState) []string {
+	loopMoves := []string{}
 
-func (mh MoveHelper) sortMovesByScore(movesWithScores []moveScore) {
-	sort.Slice(movesWithScores, func(i, j int) bool {
-		return movesWithScores[i].Score > movesWithScores[j].Score
-	})
-}
-
-func (mh MoveHelper) getAreaControlScore(state GameState, move string) int {
-	score := 0
-	newHead := mh.getNewHead(state.You.Body[0], move)
-	adjacentCells := mh.getAdjacentCells(state, newHead)
-
-	for _, cell := range adjacentCells {
-		if mh.isCellEmpty(state, cell) {
-			score++
+	for _, move := range ms.getAllowedMoves(state) {
+		newHead := ms.getNewHead(state.You.Body[0], move)
+		if ms.isInBounds(newHead, state.Board) && !ms.isCollidingWithSelf(newHead, state.You.Body) {
+			loopMoves = append(loopMoves, move)
 		}
+	}
+
+	return loopMoves
+}
+
+func (ms MoveStrategyY) simulateMove(state GameState, move string, lookAheadTurns int, stuckChance float64) GameState {
+	newState := ms.DeepCopy(state)
+	newHead := ms.getNewHead(state.You.Body[0], move)
+
+	// Simulate stuck scenario (no response in time)
+	if ms.randFloat() < stuckChance {
+		move = ms.getPreviousMove(state)
+		newHead = ms.getNewHead(state.You.Body[0], move)
+	}
+
+	newState.Board, newState.You = ms.updateGameStateForMove(newState.Board, newState.You, newHead)
+
+	if lookAheadTurns > 1 {
+		nextMove := ms.GetMove(newState).Move
+		newState = ms.simulateMove(newState, nextMove, lookAheadTurns-1, stuckChance)
+	}
+
+	return newState
+}
+
+func (ms MoveStrategyY) getPreviousMove(state GameState) string {
+	head := state.You.Body[0]
+	neck := state.You.Body[1]
+	if neck.X < head.X {
+		return "left"
+	} else if neck.X > head.X {
+		return "right"
+	} else if neck.Y < head.Y {
+		return "down"
+	} else if neck.Y > head.Y {
+		return "up"
+	}
+
+	return "up"
+}
+
+func (ms MoveStrategyY) getBoundaryPushScore(state GameState) float64 {
+	score := 0.0
+	for _, snake := range state.Board.Snakes {
+		if snake.ID == state.You.ID {
+			continue
+		}
+
+		head := snake.Body[0]
+		score += math.Min(float64(head.X), float64(state.Board.Width-head.X-1))
+		score += math.Min(float64(head.Y), float64(state.Board.Height-head.Y-1))
 	}
 
 	return score
-}
-
-func (mh MoveHelper) getAdjacentCells(state GameState, coord Coord) []Coord {
-	adjacentCells := []Coord{}
-
-	if coord.X > 0 {
-		adjacentCells = append(adjacentCells, Coord{X: coord.X - 1, Y: coord.Y})
-	}
-	if coord.X < state.Board.Width-1 {
-		adjacentCells = append(adjacentCells, Coord{X: coord.X + 1, Y: coord.Y})
-	}
-	if coord.Y > 0 {
-		adjacentCells = append(adjacentCells, Coord{X: coord.X, Y: coord.Y - 1})
-	}
-	if coord.Y < state.Board.Height-1 {
-		adjacentCells = append(adjacentCells, Coord{X: coord.X, Y: coord.Y + 1})
-	}
-
-	return adjacentCells
-}
-
-func (mh MoveHelper) isCellEmpty(state GameState, coord Coord) bool {
-	for _, snake := range state.Board.Snakes {
-		for _, snakePart := range snake.Body {
-			if snakePart.X == coord.X && snakePart.Y == coord.Y {
-				return false
-			}
-		}
-	}
-
-	for _, hazard := range state.Board.Hazards {
-		if hazard.X == coord.X && hazard.Y == coord.Y {
-			return false
-		}
-	}
-
-	return true
-}
-
-// deepcopy is a helper function for GameState deepcopy
-func (state GameState) deepcopy() GameState {
-	snakesCopy := make([]Battlesnake, len(state.Board.Snakes))
-	copy(snakesCopy, state.Board.Snakes)
-	foodCopy := make([]Coord, len(state.Board.Food))
-	copy(foodCopy, state.Board.Food)
-
-	hazardsCopy := make([]Coord, len(state.Board.Hazards))
-	copy(hazardsCopy, state.Board.Hazards)
-
-	youBodyCopy := make([]Coord, len(state.You.Body))
-	copy(youBodyCopy, state.You.Body)
-
-	return GameState{
-		Game:  state.Game,
-		Turn:  state.Turn,
-		Board: Board{Height: state.Board.Height, Width: state.Board.Width, Snakes: snakesCopy, Food: foodCopy, Hazards: hazardsCopy},
-		You:   Battlesnake{ID: state.You.ID, Name: state.You.Name, Health: state.You.Health, Body: youBodyCopy},
-	}
 }

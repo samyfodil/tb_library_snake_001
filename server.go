@@ -96,7 +96,7 @@ func move(e event.Event) uint32 {
 	case "tau005":
 		response = domove5(state)
 	case "tau006":
-		response = MoveStrategyX{NewMoveHelper(8)}.GetMove(state)
+		response = NewMoveStrategyY().GetMove(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")
