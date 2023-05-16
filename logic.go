@@ -1,11 +1,7 @@
 package lib
 
 import (
-	"crypto/rand"
-	"math/big"
 	"time"
-
-	wrand "github.com/taubyte/go-sdk/crypto/rand"
 )
 
 func info() BattlesnakeInfoResponse {
@@ -135,8 +131,7 @@ func domove(state GameState) BattlesnakeMoveResponse {
 			}
 		}
 	} else {
-		i, _ := rand.Int(wrand.NewReader(), big.NewInt(3000))
-		nextMove = safeMoves[i.Int64()%int64(len(safeMoves))]
+		nextMove = "down"
 	}
 
 	return BattlesnakeMoveResponse{Move: nextMove}
@@ -496,8 +491,7 @@ func domove4(state GameState) BattlesnakeMoveResponse {
 
 	// Choose a random move from the safest next moves
 	if len(safestNextMoves) > 0 {
-		i, _ := rand.Int(rand.Reader, big.NewInt(3000))
-		chosenMove = safestNextMoves[i.Int64()%int64(len(safestNextMoves))]
+		chosenMove = safestNextMoves[0]
 	}
 
 	return BattlesnakeMoveResponse{Move: chosenMove}
@@ -576,11 +570,8 @@ func getNextMoveSafetyScore(state GameState, opponentMoves map[string][]Coord) (
 			maxSafetyScore = score
 			bestMove = move
 		} else if score == maxSafetyScore {
-			// Generate a random number using the provided method
-			i, _ := rand.Int(rand.Reader, big.NewInt(2))
-
 			// If the random number is 0, update the bestMove
-			if i.Int64() == 0 {
+			if time.Now().Unix()%2 == 0 {
 				bestMove = move
 			}
 		}
@@ -605,8 +596,7 @@ func domove5(state GameState) BattlesnakeMoveResponse {
 	// If no safe move is found, choose a random move from all possible moves
 	if safetyScore == -1 {
 		possibleMoves := []string{"up", "down", "left", "right"}
-		i, _ := rand.Int(rand.Reader, big.NewInt(int64(len(possibleMoves))))
-		chosenMove = possibleMoves[i.Int64()]
+		chosenMove = possibleMoves[int(time.Now().Unix())%len(possibleMoves)]
 	}
 
 	return BattlesnakeMoveResponse{Move: chosenMove}
@@ -686,11 +676,8 @@ func getNextMoveSafetyScoreV2(state GameState, opponentMoves map[string][]Coord)
 			maxSafetyScore = score
 			bestMove = move
 		} else if score == maxSafetyScore {
-			// Generate a random number using the provided method
-			i, _ := rand.Int(rand.Reader, big.NewInt(2))
-
 			// If the random number is 0, update the bestMove
-			if i.Int64() == 0 {
+			if time.Now().Unix()%2 == 0 {
 				bestMove = move
 			}
 		}
