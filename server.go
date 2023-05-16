@@ -82,8 +82,22 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	response := domove(state)
-	//response := MoveStrategyX{NewMoveHelper(16)}.GetMove(state)
+	var response BattlesnakeMoveResponse
+
+	switch state.You.Name {
+	case "tau001":
+		response = domove(state)
+	case "tau002":
+		response = domove2(state)
+	case "tau003":
+		response = domove3(state)
+	case "tau004":
+		response = domove4(state)
+	case "tau005":
+		response = domove5(state)
+	case "tau006":
+		response = MoveStrategyX{NewMoveHelper(8)}.GetMove(state)
+	}
 
 	h.Headers().Set("Content-Type", "application/json")
 
