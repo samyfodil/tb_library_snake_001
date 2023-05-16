@@ -17,7 +17,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonE762775cDecodeFunctionTypes(in *jlexer.Lexer, out *RulesetSettings) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types(in *jlexer.Lexer, out *RulesetSettings) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -52,7 +52,7 @@ func easyjsonE762775cDecodeFunctionTypes(in *jlexer.Lexer, out *RulesetSettings)
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes(out *jwriter.Writer, in RulesetSettings) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types(out *jwriter.Writer, in RulesetSettings) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -88,27 +88,27 @@ func easyjsonE762775cEncodeFunctionTypes(out *jwriter.Writer, in RulesetSettings
 // MarshalJSON supports json.Marshaler interface
 func (v RulesetSettings) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v RulesetSettings) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *RulesetSettings) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *RulesetSettings) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes1(in *jlexer.Lexer, out *Ruleset) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types1(in *jlexer.Lexer, out *Ruleset) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -143,7 +143,7 @@ func easyjsonE762775cDecodeFunctionTypes1(in *jlexer.Lexer, out *Ruleset) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes1(out *jwriter.Writer, in Ruleset) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types1(out *jwriter.Writer, in Ruleset) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -179,27 +179,27 @@ func easyjsonE762775cEncodeFunctionTypes1(out *jwriter.Writer, in Ruleset) {
 // MarshalJSON supports json.Marshaler interface
 func (v Ruleset) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes1(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Ruleset) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes1(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Ruleset) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes1(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Ruleset) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes1(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types1(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes2(in *jlexer.Lexer, out *GameState) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types2(in *jlexer.Lexer, out *GameState) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -236,7 +236,7 @@ func easyjsonE762775cDecodeFunctionTypes2(in *jlexer.Lexer, out *GameState) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes2(out *jwriter.Writer, in GameState) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types2(out *jwriter.Writer, in GameState) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -282,27 +282,27 @@ func easyjsonE762775cEncodeFunctionTypes2(out *jwriter.Writer, in GameState) {
 // MarshalJSON supports json.Marshaler interface
 func (v GameState) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes2(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v GameState) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes2(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *GameState) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes2(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *GameState) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes2(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types2(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes3(in *jlexer.Lexer, out *Game) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types3(in *jlexer.Lexer, out *Game) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -341,7 +341,7 @@ func easyjsonE762775cDecodeFunctionTypes3(in *jlexer.Lexer, out *Game) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes3(out *jwriter.Writer, in Game) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types3(out *jwriter.Writer, in Game) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -397,27 +397,27 @@ func easyjsonE762775cEncodeFunctionTypes3(out *jwriter.Writer, in Game) {
 // MarshalJSON supports json.Marshaler interface
 func (v Game) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes3(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types3(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Game) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes3(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types3(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Game) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes3(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types3(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Game) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes3(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types3(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes4(in *jlexer.Lexer, out *Customizations) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types4(in *jlexer.Lexer, out *Customizations) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -452,7 +452,7 @@ func easyjsonE762775cDecodeFunctionTypes4(in *jlexer.Lexer, out *Customizations)
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes4(out *jwriter.Writer, in Customizations) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types4(out *jwriter.Writer, in Customizations) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -488,27 +488,27 @@ func easyjsonE762775cEncodeFunctionTypes4(out *jwriter.Writer, in Customizations
 // MarshalJSON supports json.Marshaler interface
 func (v Customizations) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes4(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Customizations) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes4(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Customizations) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes4(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Customizations) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes4(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types4(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes5(in *jlexer.Lexer, out *Coord) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types5(in *jlexer.Lexer, out *Coord) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -541,7 +541,7 @@ func easyjsonE762775cDecodeFunctionTypes5(in *jlexer.Lexer, out *Coord) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes5(out *jwriter.Writer, in Coord) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types5(out *jwriter.Writer, in Coord) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -567,27 +567,27 @@ func easyjsonE762775cEncodeFunctionTypes5(out *jwriter.Writer, in Coord) {
 // MarshalJSON supports json.Marshaler interface
 func (v Coord) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes5(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Coord) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes5(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Coord) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes5(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Coord) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes5(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types5(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes6(in *jlexer.Lexer, out *Board) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types6(in *jlexer.Lexer, out *Board) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -689,7 +689,7 @@ func easyjsonE762775cDecodeFunctionTypes6(in *jlexer.Lexer, out *Board) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes6(out *jwriter.Writer, in Board) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types6(out *jwriter.Writer, in Board) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -772,27 +772,27 @@ func easyjsonE762775cEncodeFunctionTypes6(out *jwriter.Writer, in Board) {
 // MarshalJSON supports json.Marshaler interface
 func (v Board) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes6(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Board) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes6(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Board) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes6(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Board) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes6(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types6(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes7(in *jlexer.Lexer, out *BattlesnakeMoveResponse) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types7(in *jlexer.Lexer, out *BattlesnakeMoveResponse) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -825,7 +825,7 @@ func easyjsonE762775cDecodeFunctionTypes7(in *jlexer.Lexer, out *BattlesnakeMove
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes7(out *jwriter.Writer, in BattlesnakeMoveResponse) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types7(out *jwriter.Writer, in BattlesnakeMoveResponse) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -851,27 +851,27 @@ func easyjsonE762775cEncodeFunctionTypes7(out *jwriter.Writer, in BattlesnakeMov
 // MarshalJSON supports json.Marshaler interface
 func (v BattlesnakeMoveResponse) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes7(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types7(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v BattlesnakeMoveResponse) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes7(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types7(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *BattlesnakeMoveResponse) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes7(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types7(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *BattlesnakeMoveResponse) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes7(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types7(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes8(in *jlexer.Lexer, out *BattlesnakeInfoResponse) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types8(in *jlexer.Lexer, out *BattlesnakeInfoResponse) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -910,7 +910,7 @@ func easyjsonE762775cDecodeFunctionTypes8(in *jlexer.Lexer, out *BattlesnakeInfo
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes8(out *jwriter.Writer, in BattlesnakeInfoResponse) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types8(out *jwriter.Writer, in BattlesnakeInfoResponse) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -966,27 +966,27 @@ func easyjsonE762775cEncodeFunctionTypes8(out *jwriter.Writer, in BattlesnakeInf
 // MarshalJSON supports json.Marshaler interface
 func (v BattlesnakeInfoResponse) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes8(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types8(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v BattlesnakeInfoResponse) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes8(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types8(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *BattlesnakeInfoResponse) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes8(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types8(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *BattlesnakeInfoResponse) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes8(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types8(l, v)
 }
-func easyjsonE762775cDecodeFunctionTypes9(in *jlexer.Lexer, out *Battlesnake) {
+func easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types9(in *jlexer.Lexer, out *Battlesnake) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -1054,7 +1054,7 @@ func easyjsonE762775cDecodeFunctionTypes9(in *jlexer.Lexer, out *Battlesnake) {
 		in.Consumed()
 	}
 }
-func easyjsonE762775cEncodeFunctionTypes9(out *jwriter.Writer, in Battlesnake) {
+func easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types9(out *jwriter.Writer, in Battlesnake) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -1159,23 +1159,23 @@ func easyjsonE762775cEncodeFunctionTypes9(out *jwriter.Writer, in Battlesnake) {
 // MarshalJSON supports json.Marshaler interface
 func (v Battlesnake) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonE762775cEncodeFunctionTypes9(&w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types9(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Battlesnake) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonE762775cEncodeFunctionTypes9(w, v)
+	easyjsonE762775cEncodeGithubComSamyfodilTbLibrarySnake001Types9(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Battlesnake) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonE762775cDecodeFunctionTypes9(&r, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types9(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Battlesnake) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonE762775cDecodeFunctionTypes9(l, v)
+	easyjsonE762775cDecodeGithubComSamyfodilTbLibrarySnake001Types9(l, v)
 }
