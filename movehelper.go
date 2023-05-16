@@ -1,12 +1,9 @@
 package lib
 
 import (
-	"encoding/binary"
-	"io"
-	"log"
 	"math"
-
-	wrand "github.com/taubyte/go-sdk/crypto/rand"
+	"math/rand"
+	"time"
 )
 
 type MoveHelper struct{}
@@ -79,22 +76,8 @@ func (mh MoveHelper) euclideanDistance(a Coord, b Coord) float64 {
 }
 
 func (mh MoveHelper) randFloat() float64 {
-	randomFloat64, err := mh.cryptoRandFloat64()
-	if err != nil {
-		log.Println("Error generating random float64:", err)
-		return 0.0
-	}
-	return randomFloat64
-}
-
-func (mh MoveHelper) cryptoRandFloat64() (float64, error) {
-	var buf [8]byte
-	_, err := io.ReadFull(wrand.NewReader(), buf[:])
-	if err != nil {
-		return 0, err
-	}
-	u := binary.LittleEndian.Uint64(buf[:])
-	return float64(u) / (1 << 64), nil
+	rand.Seed(time.Now().UnixNano())
+	return rand.Float64()
 }
 
 func (mh MoveHelper) isMoveSafe(state GameState, move string) bool {
