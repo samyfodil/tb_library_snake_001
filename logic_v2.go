@@ -59,6 +59,11 @@ func (ms MoveStrategyY) calculateMoveScoreY(state GameState, move string) float6
 	newState := ms.simulateMove(state, move, ms.LookAheadTurns, ms.SimulateStuck)
 	score := 0.0
 
+	// Check if the move is out of bounds
+	if ms.isOutOfBounds(newState.Board, newState.You.Body[0]) {
+		return math.Inf(-1) // return a negative infinity score to strongly penalize the move
+	}
+
 	// Encourage pushing other snakes to hit bounds
 	score += ms.getBoundaryPushScore(state)
 
