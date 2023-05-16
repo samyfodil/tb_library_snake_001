@@ -1,9 +1,10 @@
 package v2
 
 import (
-	"function/types"
 	"math/rand"
 	"time"
+
+	"github.com/samyfodil/tb_library_snake_001/types"
 )
 
 var LookStepsAhead = 2

@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"function/types"
-	v1 "function/v1"
-	v2 "function/v2"
 	"io"
+
+	"github.com/samyfodil/tb_library_snake_001/types"
+	v1 "github.com/samyfodil/tb_library_snake_001/v1"
+	v2 "github.com/samyfodil/tb_library_snake_001/v2"
 
 	"github.com/taubyte/go-sdk/event"
 )

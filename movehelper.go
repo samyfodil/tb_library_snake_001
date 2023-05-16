@@ -1,10 +1,11 @@
 package lib
 
 import (
-	"function/types"
 	"math"
 	"math/rand"
 	"time"
+
+	"github.com/samyfodil/tb_library_snake_001/types"
 )
 
 type MoveHelper struct{}

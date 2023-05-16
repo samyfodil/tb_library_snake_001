@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"function/types"
+	"github.com/samyfodil/tb_library_snake_001/types"
 )
 
 func info() types.BattlesnakeInfoResponse {

@@ -1,4 +1,4 @@
-module function
+module github.com/samyfodil/tb_library_snake_001
 
 go 1.19
 
