@@ -2,7 +2,7 @@
 
 . /utils/wasm.sh
 
-build "${FILENAME}"
+debug_build 2 "${FILENAME}"
 ret=$?
 echo -n $ret > /out/ret-code
 exit $ret

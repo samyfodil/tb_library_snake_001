@@ -82,7 +82,9 @@ func move(e event.Event) uint32 {
 		return 1
 	}
 
-	var response BattlesnakeMoveResponse
+	response := BattlesnakeMoveResponse{
+		Move: "down",
+	}
 
 	switch state.You.Name {
 	case "tau001":
@@ -95,8 +97,8 @@ func move(e event.Event) uint32 {
 		response = domove4(state)
 	case "tau005":
 		response = domove5(state)
-	case "tau006":
-		response = NewMoveStrategyY().GetMove(state)
+		// case "tau006":
+		// 	response = NewMoveStrategyY().GetMove(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")
