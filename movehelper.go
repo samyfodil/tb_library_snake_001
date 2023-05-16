@@ -102,29 +102,6 @@ func (mh MoveHelper) isMoveSafe(state GameState, move string) bool {
 	return mh.isInBounds(newHead, state.Board) && !mh.isCollidingWithSelf(newHead, state.You.Body)
 }
 
-// func (ms MoveStrategyY) calculateMoveScoreY(state GameState, move string) float64 {
-// 	newState := ms.simulateMove(state, move, ms.LookAheadTurns, ms.SimulateStuck)
-// 	score := 0.0
-
-// 	// Encourage pushing other snakes to hit bounds
-// 	score += ms.getBoundaryPushScore(state)
-
-// 	// Discourage getting food unless necessary
-// 	if state.You.Health < 60 {
-// 		score += float64(ms.getFoodScore(state, newState))
-// 	}
-
-// 	// Avoid hitting other snakes
-// 	score -= ms.getCollisionScore(newState)
-
-// 	return score
-// }
-
-// func (mh MoveHelper) getFoodScore(state GameState, move string) int {
-// 	newHead := mh.getNewHead(state.You.Body[0], move)
-// 	return mh.distanceToClosestFood(newHead, state.Board.Food)
-// }
-
 func (mh MoveHelper) getCollisionScore(state GameState, move string) int {
 	newHead := mh.getNewHead(state.You.Body[0], move)
 	return mh.distanceToClosestCollision(newHead, state.Board)
