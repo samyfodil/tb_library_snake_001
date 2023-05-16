@@ -170,18 +170,77 @@ func abs(x int) int {
 	return x
 }
 
+func countSegmentsInHazard(snake types.Battlesnake, board types.Board) int {
+	segmentsInHazard := 0
+	for _, segment := range snake.Body {
+		for _, hazard := range board.Hazards {
+			if segment.X == hazard.X && segment.Y == hazard.Y {
+				segmentsInHazard++
+			}
+		}
+	}
+	return segmentsInHazard
+}
+
+func freeSpaceRatio(state types.GameState) float64 {
+	totalSpaces := state.Board.Width * state.Board.Height
+	occupiedSpaces := 0
+
+	for _, snake := range state.Board.Snakes {
+		occupiedSpaces += len(snake.Body)
+	}
+
+	freeSpaces := totalSpaces - occupiedSpaces
+	return float64(freeSpaces) / float64(totalSpaces)
+}
+
 func chooseBestMove(state types.GameState, safeMoves []string) string {
 	myHead := state.You.Head
 	minDist := state.Board.Width*state.Board.Height + 1
 	bestMove := safeMoves[0]
 
+	// Calculate the number of snake body segments in the hazard area
+	segmentsInHazard := countSegmentsInHazard(state.You, state.Board)
+	hazardWeight := float64(segmentsInHazard) * 1.5 // Adjust the multiplier as needed to fine-tune the prioritization
+
+	// Calculate the free space ratio
+	spaceRatio := freeSpaceRatio(state)
+
+	// Calculate the dynamic health threshold
+	healthThreshold := 30 + int((1-spaceRatio)*40) // This threshold ranges between 30 and 70 based on spaceRatio
+
+	// Prioritize getting food when health is below the dynamic threshold
+	shouldGetFood := state.You.Health < healthThreshold
+
 	for _, move := range safeMoves {
 		newHead := applyMove(myHead, move)
+
+		// Check if the new head position is in a hazard
+		inHazard := isCoordInList(newHead, state.Board.Hazards)
+
+		// Move out of the hazard area when more of the snake's body is in it
+		if inHazard {
+			if hazardWeight > 0 {
+				hazardWeight -= 1
+				continue
+			}
+		}
+
+		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
 		for _, food := range state.Board.Food {
 			dist := distance(newHead, food)
-			if dist < minDist {
-				minDist = dist
-				bestMove = move
+			if shouldGetFood {
+				// If the snake should get food, prioritize the moves that minimize the distance to food
+				if dist < minDist {
+					minDist = dist
+					bestMove = move
+				}
+			} else {
+				// If the snake should not get food, prioritize the moves that maximize the distance to food
+				if dist > minDist {
+					minDist = dist
+					bestMove = move
+				}
 			}
 		}
 	}
