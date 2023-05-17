@@ -97,17 +97,17 @@ func isCoordInSnakeLists(state types.GameState, coord types.Coord) bool {
 }
 
 func nextMove(head types.Coord, board [][]float64) string {
-	adjacentCoords := getAdjacentCoords(head)
-	sort.Slice(adjacentCoords, func(i, j int) bool {
-		return board[adjacentCoords[i].Y][adjacentCoords[i].X] > board[adjacentCoords[j].Y][adjacentCoords[j].X]
-
-	})
-
 	// Filter out moves that would go out of bounds
 	width := len(board[0])
 	height := len(board)
-	adjacentCoords = filter(adjacentCoords, func(coord types.Coord) bool {
+
+	adjacentCoords := filter(getAdjacentCoords(head), func(coord types.Coord) bool {
 		return isCoordInBounds(coord, width, height)
+	})
+
+	sort.Slice(adjacentCoords, func(i, j int) bool {
+		return board[adjacentCoords[i].Y][adjacentCoords[i].X] > board[adjacentCoords[j].Y][adjacentCoords[j].X]
+
 	})
 
 	bestCoord := adjacentCoords[0]
