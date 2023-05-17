@@ -89,7 +89,13 @@ func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) 
 		}
 
 		// Check if the new head position is in your own body
-		if isCoordInList(newHead, body) {
+		if isCoordInList(newHead, body[1:]) {
+			moveScores[move] = -1000
+			continue
+		}
+
+		// Check if the new head position is in your own body
+		if isCoordInList(newHead, body[:len(body)-1]) {
 			moveScores[move] = -1000
 			continue
 		}
@@ -128,6 +134,9 @@ func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) 
 	bestScore := math.MinInt32
 	bestMoves := []string{}
 	for move, score := range moveScores {
+		if score == -1000 {
+			continue
+		}
 		if score > bestScore {
 			bestScore = score
 			bestMoves = []string{move}
