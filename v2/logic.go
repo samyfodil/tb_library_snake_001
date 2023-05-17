@@ -99,6 +99,22 @@ func getSafeMoves(state types.GameState, head types.Coord, body []types.Coord) [
 			continue
 		}
 
+		// Check for possible head-to-head collisions with other snakes
+		for _, otherSnake := range state.Board.Snakes {
+			if otherSnake.ID == state.You.ID {
+				continue
+			}
+			for _, otherMove := range possibleMoves {
+				otherNewHead := applyMove(otherSnake.Head, otherMove)
+				if newHead == otherNewHead {
+					if len(otherSnake.Body) >= len(body) {
+						moveScores[move] = -1000
+					}
+					continue
+				}
+			}
+		}
+
 		// Check if the new head position is in a hazard
 		if isCoordInList(newHead, board.Hazards) {
 			if !isHeadInHazard {
