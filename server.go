@@ -3,11 +3,11 @@ package main
 import (
 	"io"
 
-	"github.com/samyfodil/tb_library_snake_001/dad"
 	"github.com/samyfodil/tb_library_snake_001/types"
 	v1 "github.com/samyfodil/tb_library_snake_001/v1"
 	v2 "github.com/samyfodil/tb_library_snake_001/v2"
 	v3 "github.com/samyfodil/tb_library_snake_001/v3"
+	v4 "github.com/samyfodil/tb_library_snake_001/v4"
 
 	"github.com/taubyte/go-sdk/event"
 )
@@ -107,8 +107,8 @@ func move(e event.Event) uint32 {
 		response = v2.Move(state)
 	case "tau007":
 		response = v3.Move(state)
-	case "taudad":
-		response = dad.Move(state)
+	case "tau008":
+		response = v4.Move(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")
