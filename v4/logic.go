@@ -2,12 +2,13 @@ package v4
 
 import (
 	"math/rand"
+	"sort"
 	"time"
 
 	"github.com/samyfodil/tb_library_snake_001/types"
 )
 
-var LookStepsAhead = 16
+var LookStepsAhead = 2
 
 // Initialize the random seed
 func init() {
@@ -171,10 +172,11 @@ func abs(x int) int {
 	return x
 }
 
-func shuffleMoves(moves []string) {
+func shuffleMoves(moves []string, score []int) {
 	for i := len(moves) - 1; i > 0; i-- {
 		j := rand.Intn(i + 1)
 		moves[i], moves[j] = moves[j], moves[i]
+		score[i], score[j] = score[j], score[i]
 	}
 }
 
@@ -230,12 +232,13 @@ func freeSpaceRatio(state *types.GameState) float64 {
 
 var possibleMoves = []string{"up", "down", "left", "right"}
 
-func chooseBestMove(state *types.GameState, safeMoves []string) string {
+func chooseBestMove(state *types.GameState, safeMoves []string, safeMovesAfterNStep []int) string {
 	myHead := state.You.Head
 	minDist := state.Board.Width*state.Board.Height + 1
 	maxDist := -1
 
 	bestMoves := []string{}
+	bestMovesScore := []int{}
 
 	// Calculate the number of snake body segments in the hazard area
 	segmentsInHazard := countSegmentsInHazard(state.You, state.Board)
@@ -263,7 +266,7 @@ func chooseBestMove(state *types.GameState, safeMoves []string) string {
 		shouldGetFood = true
 	}
 
-	for _, move := range safeMoves {
+	for i, move := range safeMoves {
 		newHead := applyMove(myHead, move)
 
 		// Check if the new head position is in a hazard
@@ -274,24 +277,6 @@ func chooseBestMove(state *types.GameState, safeMoves []string) string {
 			if hazardWeight > 0 {
 				hazardWeight -= 1
 				continue
-			}
-		}
-
-		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
-		for _, food := range state.Board.Food {
-			dist := distance(newHead, food)
-			if shouldGetFood {
-				// If the snake should get food, prioritize the moves that minimize the distance to food
-				if dist <= minDist {
-					minDist = dist
-					bestMoves = append(bestMoves, move)
-				}
-			} else {
-				// If the snake should not get food, prioritize the moves that maximize the distance to food
-				if dist >= maxDist {
-					maxDist = dist
-					bestMoves = append(bestMoves, move)
-				}
 			}
 		}
 
@@ -310,10 +295,36 @@ func chooseBestMove(state *types.GameState, safeMoves []string) string {
 				}
 			}
 		}
+
+		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
+		for _, food := range state.Board.Food {
+			dist := distance(newHead, food)
+			if shouldGetFood {
+				// If the snake should get food, prioritize the moves that minimize the distance to food
+				if dist <= minDist {
+					minDist = dist
+					bestMoves = append(bestMoves, move)
+					bestMovesScore = append(bestMovesScore, safeMovesAfterNStep[i])
+				}
+			} else {
+				// If the snake should not get food, prioritize the moves that maximize the distance to food
+				if dist >= maxDist {
+					maxDist = dist
+					bestMoves = append(bestMoves, move)
+					bestMovesScore = append(bestMovesScore, safeMovesAfterNStep[i])
+				}
+			}
+		}
+
 	}
 
 	// Shuffle the best moves list
-	shuffleMoves(bestMoves)
+	shuffleMoves(bestMoves, bestMovesScore)
+
+	sort.Slice(bestMoves, func(i, j int) bool {
+		return bestMovesScore[i] > bestMovesScore[j]
+
+	})
 
 	// Find the first safe move from the shuffled list
 	for _, move := range bestMoves {
@@ -328,9 +339,9 @@ func chooseBestMove(state *types.GameState, safeMoves []string) string {
 	return safeMoves[rand.Intn(len(safeMoves))]
 }
 
-func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) bool {
+func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) (bool, int) {
 	if steps == 0 {
-		return true
+		return true, steps
 	}
 
 	// Apply the move to the current head position
@@ -338,7 +349,7 @@ func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) bool 
 
 	// Check if the new head position is inside the board
 	if newHead.X < 0 || newHead.X >= state.Board.Width || newHead.Y < 0 || newHead.Y >= state.Board.Height {
-		return false
+		return false, steps
 	}
 
 	// Create a new state where our snake has made the move
@@ -355,17 +366,17 @@ func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) bool 
 
 	// If there are no safe moves left in the new state, the initial move is not safe
 	if len(safeMoves) == 0 {
-		return false
+		return false, steps
 	}
 
 	// Check if the moves are safe after N-1 steps
 	for _, nextMove := range safeMoves {
-		if !isMoveSafeAfterNSteps(newState, nextMove, steps-1) {
-			return false
+		if safe, _ := isMoveSafeAfterNSteps(newState, nextMove, steps-1); !safe {
+			return false, steps
 		}
 	}
 
-	return true
+	return true, steps
 }
 
 func Move(state *types.GameState) types.BattlesnakeMoveResponse {
@@ -373,20 +384,13 @@ func Move(state *types.GameState) types.BattlesnakeMoveResponse {
 	safeMoves := getSafeMoves(state, state.You.Head, state.You.Body)
 
 	// Filter out moves that would not be safe after N steps
-	safeMovesAfterNSteps := make([]string, 0, len(safeMoves))
-	for _, move := range safeMoves {
-		if isMoveSafeAfterNSteps(state, move, LookStepsAhead) {
-			safeMovesAfterNSteps = append(safeMovesAfterNSteps, move)
-		}
-	}
-
-	// If there are no safe moves left after filtering, fall back to the initial safe moves
-	if len(safeMovesAfterNSteps) == 0 {
-		safeMovesAfterNSteps = safeMoves
+	safeMovesAfterNSteps := make([]int, len(safeMoves))
+	for i, move := range safeMoves {
+		_, safeMovesAfterNSteps[i] = isMoveSafeAfterNSteps(state, move, LookStepsAhead)
 	}
 
 	// Choose the best move based on your criteria (e.g., move towards food)
-	nextMove := chooseBestMove(state, safeMovesAfterNSteps)
+	nextMove := chooseBestMove(state, safeMoves, safeMovesAfterNSteps)
 
 	return types.BattlesnakeMoveResponse{Move: nextMove}
 }
