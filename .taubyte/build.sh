@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -X
+set -x
 
 . /utils/wasm.sh
 
