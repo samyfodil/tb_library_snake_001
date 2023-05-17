@@ -327,11 +327,10 @@ func FilterPossibleMovesPass1(data *MoveRequest, directions []string) []string {
 	ret := make([]string, 0)
 	for _, direc := range directions {
 		if data.Direcs[direc].Moves > 0 {
-			snake := data.Snakes[data.MyIndex]
-			if snake == nil {
+			head := data.Snakes[data.MyIndex].Head()
+			if head == nil {
 				break
 			}
-			head := snake.Head()
 			p, _ := GetPointInDirectionHazards(head, direc, data)
 
 			if p != nil && !data.Hazards[p.String()] {
