@@ -77,7 +77,7 @@ func quickStats2(data *MoveRequest, direc string) *MetaDataDirec {
 	for i := range accumulator.minMaxArr {
 		accumulator.minMaxArr[i] = make([]MinMaxData, data.Width)
 		for j := range accumulator.minMaxArr[i] {
-			accumulator.minMaxArr[i][j].moves = math.MaxInt64
+			accumulator.minMaxArr[i][j].moves = math.MaxInt
 		}
 
 	}

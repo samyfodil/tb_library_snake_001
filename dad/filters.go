@@ -250,7 +250,7 @@ func FilterKeyArea(data *MoveRequest, moves []string) []string {
 
 func FilterClosestFoodDirections(data *MoveRequest, moves []string) []string {
 	directions := []string{}
-	min := math.MaxInt64
+	min := math.MaxInt
 	for _, direc := range moves {
 		food := findGuaranteedClosestFood(data, direc)
 		if food == nil {
@@ -309,7 +309,7 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 		}
 	}
 	if len(ret) == 0 {
-		max := math.MinInt64
+		max := math.MinInt
 		for _, direc := range moves {
 			if data.Direcs[direc].MovesVsSpace == max {
 				ret = append(ret, direc)
