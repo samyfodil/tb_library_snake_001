@@ -347,7 +347,7 @@ func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 	if len(ret) == 0 {
 		data.GenHazards(data, false)
 		for _, direc := range directions {
-			if data.Direcs[direc].Moves > 0 {
+			if data.Direcs[direc] != nil && data.Direcs[direc].Moves > 0 {
 				ret = append(ret, direc)
 			}
 		}
