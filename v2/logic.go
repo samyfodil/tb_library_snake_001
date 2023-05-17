@@ -187,14 +187,38 @@ func shuffleMoves(moves []string) {
 	}
 }
 
+func isSafeMove(newHead types.Coord, state types.GameState) bool {
+	// Check if the new head position is within the board boundaries
+	if newHead.X < 0 || newHead.Y < 0 || newHead.X >= state.Board.Width || newHead.Y >= state.Board.Height {
+		return false
+	}
+
+	// Check if the new head position collides with the snake's own body
+	if isCoordInList(newHead, state.You.Body) {
+		return false
+	}
+
+	// Check if the new head position collides with other snakes
+	for _, snake := range state.Board.Snakes {
+		// Skip the dead snakes
+		if snake.Health <= 1 || (isCoordInList(snake.Body[0], state.Board.Hazards) && snake.Health <= 16) {
+			continue
+		}
+
+		if isCoordInList(newHead, snake.Body) {
+			return false
+		}
+	}
+
+	return true
+}
+
 func chooseBestMove(state types.GameState, safeMoves []string) string {
 	myHead := state.You.Head
 	minDist := state.Board.Width*state.Board.Height + 1
 	maxDist := -1
-	bestMove := safeMoves[0]
 
-	// Shuffle safeMoves to add randomness
-	shuffleMoves(safeMoves)
+	bestMoves := []string{}
 
 	// Calculate the number of snake body segments in the hazard area
 	segmentsInHazard := countSegmentsInHazard(state.You, state.Board)
@@ -223,25 +247,38 @@ func chooseBestMove(state types.GameState, safeMoves []string) string {
 			}
 		}
 
-		// If the snake should get food, prioritize the moves that minimize the distance to food
-		// If the snake should not get food, prioritize the moves that maximize the distance to food
+		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
 		for _, food := range state.Board.Food {
 			dist := distance(newHead, food)
 			if shouldGetFood {
-				if dist < minDist {
+				// If the snake should get food, prioritize the moves that minimize the distance to food
+				if dist <= minDist && rand.Float64()*100 < float64(healthThreshold) {
 					minDist = dist
-					bestMove = move
+					bestMoves = append(bestMoves, move)
 				}
 			} else {
-				if dist > maxDist {
+				// If the snake should not get food, prioritize the moves that maximize the distance to food
+				if dist >= maxDist && rand.Float64()*100 < float64(100-healthThreshold) {
 					maxDist = dist
-					bestMove = move
+					bestMoves = append(bestMoves, move)
 				}
 			}
 		}
 	}
 
-	return bestMove
+	// Shuffle the best moves list
+	shuffleMoves(bestMoves)
+
+	// Find the first safe move from the shuffled list
+	for _, move := range bestMoves {
+		newHead := applyMove(myHead, move)
+		if isSafeMove(newHead, state) {
+			return move
+		}
+	}
+
+	// If no safe move is found in the shuffled best moves, fallback to the first safe move
+	return safeMoves[0]
 }
 
 func isMoveSafeAfterNSteps(state types.GameState, move string, steps int) bool {
