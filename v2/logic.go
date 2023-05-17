@@ -16,20 +16,6 @@ func init() {
 
 // Helper functions
 
-func remove(slice []string, s string) []string {
-	index := -1
-	for i, v := range slice {
-		if v == s {
-			index = i
-			break
-		}
-	}
-	if index == -1 {
-		return slice
-	}
-	return append(slice[:index], slice[index+1:]...)
-}
-
 func applyMove(head types.Coord, move string) types.Coord {
 	switch move {
 	case "up":
@@ -194,10 +180,21 @@ func freeSpaceRatio(state types.GameState) float64 {
 	return float64(freeSpaces) / float64(totalSpaces)
 }
 
+func shuffleMoves(moves []string) {
+	for i := len(moves) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		moves[i], moves[j] = moves[j], moves[i]
+	}
+}
+
 func chooseBestMove(state types.GameState, safeMoves []string) string {
 	myHead := state.You.Head
 	minDist := state.Board.Width*state.Board.Height + 1
+	maxDist := -1
 	bestMove := safeMoves[0]
+
+	// Shuffle safeMoves to add randomness
+	shuffleMoves(safeMoves)
 
 	// Calculate the number of snake body segments in the hazard area
 	segmentsInHazard := countSegmentsInHazard(state.You, state.Board)
@@ -226,19 +223,18 @@ func chooseBestMove(state types.GameState, safeMoves []string) string {
 			}
 		}
 
-		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
+		// If the snake should get food, prioritize the moves that minimize the distance to food
+		// If the snake should not get food, prioritize the moves that maximize the distance to food
 		for _, food := range state.Board.Food {
 			dist := distance(newHead, food)
 			if shouldGetFood {
-				// If the snake should get food, prioritize the moves that minimize the distance to food
 				if dist < minDist {
 					minDist = dist
 					bestMove = move
 				}
 			} else {
-				// If the snake should not get food, prioritize the moves that maximize the distance to food
-				if dist > minDist {
-					minDist = dist
+				if dist > maxDist {
+					maxDist = dist
 					bestMove = move
 				}
 			}
