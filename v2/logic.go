@@ -41,7 +41,7 @@ func isCoordInList(coord types.Coord, list []types.Coord) bool {
 	return false
 }
 
-func predictSnakesNextPositions(state types.GameState) types.Board {
+func predictSnakesNextPositions(state *types.GameState) types.Board {
 	board := state.Board
 	for i, snake := range board.Snakes {
 		// Skip dead snakes
@@ -69,7 +69,7 @@ func predictSnakesNextPositions(state types.GameState) types.Board {
 	return board
 }
 
-func getSafeMoves(state types.GameState, head types.Coord, body []types.Coord) []string {
+func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) []string {
 	board := state.Board
 	possibleMoves := []string{"up", "down", "left", "right"}
 
@@ -147,7 +147,7 @@ func getSafeMoves(state types.GameState, head types.Coord, body []types.Coord) [
 	return []string{bestMove}
 }
 
-func isCoordInSnakeLists(state types.GameState, coord types.Coord) bool {
+func isCoordInSnakeLists(state *types.GameState, coord types.Coord) bool {
 	for _, snake := range state.Board.Snakes {
 		// Skip the dead snakes
 		if snake.Health <= 1 || (isCoordInList(snake.Body[0], state.Board.Hazards) && snake.Health <= 16) {
@@ -184,7 +184,7 @@ func countSegmentsInHazard(snake types.Battlesnake, board types.Board) int {
 	return segmentsInHazard
 }
 
-func freeSpaceRatio(state types.GameState) float64 {
+func freeSpaceRatio(state *types.GameState) float64 {
 	totalSpaces := state.Board.Width * state.Board.Height
 	occupiedSpaces := 0
 
@@ -203,7 +203,7 @@ func shuffleMoves(moves []string) {
 	}
 }
 
-func isSafeMove(newHead types.Coord, state types.GameState) bool {
+func isSafeMove(newHead types.Coord, state *types.GameState) bool {
 	// Check if the new head position is within the board boundaries
 	if newHead.X < 0 || newHead.Y < 0 || newHead.X >= state.Board.Width || newHead.Y >= state.Board.Height {
 		return false
@@ -229,7 +229,7 @@ func isSafeMove(newHead types.Coord, state types.GameState) bool {
 	return true
 }
 
-func chooseBestMove(state types.GameState, safeMoves []string) string {
+func chooseBestMove(state *types.GameState, safeMoves []string) string {
 	myHead := state.You.Head
 	minDist := state.Board.Width*state.Board.Height + 1
 	maxDist := -1
@@ -310,7 +310,7 @@ func chooseBestMove(state types.GameState, safeMoves []string) string {
 	return safeMoves[0]
 }
 
-func isMoveSafeAfterNSteps(state types.GameState, move string, steps int) bool {
+func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) bool {
 	if steps == 0 {
 		return true
 	}
@@ -350,7 +350,7 @@ func isMoveSafeAfterNSteps(state types.GameState, move string, steps int) bool {
 	return true
 }
 
-func Move(state types.GameState) types.BattlesnakeMoveResponse {
+func Move(state *types.GameState) types.BattlesnakeMoveResponse {
 	// Get safe moves for our snake based on the current state
 	safeMoves := getSafeMoves(state, state.You.Head, state.You.Body)
 

@@ -19,7 +19,7 @@ func info() types.BattlesnakeInfoResponse {
 // move is called on every turn and returns your next move
 // Valid moves are "up", "down", "left", or "right"
 // See https://docs.battlesnake.com/api/example-move for available data
-func Domove(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove(state *types.GameState) types.BattlesnakeMoveResponse {
 
 	isMoveSafe := map[string]bool{
 		"up":    true,
@@ -139,7 +139,7 @@ func Domove(state types.GameState) types.BattlesnakeMoveResponse {
 	return types.BattlesnakeMoveResponse{Move: nextMove}
 }
 
-func Domove2(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove2(state *types.GameState) types.BattlesnakeMoveResponse {
 
 	isMoveSafe := map[string]bool{
 		"up":    true,
@@ -286,7 +286,7 @@ func getMoveTowardsFood(head, food types.Coord) string {
 
 }
 
-func Domove3(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove3(state *types.GameState) types.BattlesnakeMoveResponse {
 	// Get safe moves
 	safeMoves := getSafeMoves(state)
 
@@ -309,7 +309,7 @@ func Domove3(state types.GameState) types.BattlesnakeMoveResponse {
 	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func getSafeMoves(state types.GameState) []string {
+func getSafeMoves(state *types.GameState) []string {
 	myHead := state.You.Body[0]
 	myBody := state.You.Body[1:]
 
@@ -420,7 +420,7 @@ func getSafeMovesFromOpponents(myHead types.Coord, safeMoves []string, opponentM
 	return safestMoves
 }
 
-func getAllOpponentMoves(state types.GameState) map[string][]types.Coord {
+func getAllOpponentMoves(state *types.GameState) map[string][]types.Coord {
 	opponentMoves := make(map[string][]types.Coord)
 
 	for _, snake := range state.Board.Snakes {
@@ -444,7 +444,7 @@ func getPossibleMoves(head types.Coord) []types.Coord {
 
 var lookAheadMoves = 8
 
-func Domove4(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove4(state *types.GameState) types.BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
 
 	// Get safe moves
@@ -499,8 +499,8 @@ func Domove4(state types.GameState) types.BattlesnakeMoveResponse {
 	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func deepCopyGameState(original types.GameState) types.GameState {
-	copied := types.GameState{
+func deepCopyGameState(original *types.GameState) *types.GameState {
+	copied := &types.GameState{
 		Game: original.Game,
 		Turn: original.Turn,
 		Board: types.Board{
@@ -528,14 +528,14 @@ func deepCopyGameState(original types.GameState) types.GameState {
 	return copied
 }
 
-func simulateMove(state types.GameState, move string) types.GameState {
+func simulateMove(state *types.GameState, move string) *types.GameState {
 	simulatedState := deepCopyGameState(state)
 	newHead := getNewHead(simulatedState.You.Body[0], move)
 	simulatedState.You.Body = append([]types.Coord{newHead}, simulatedState.You.Body...)
 	return simulatedState
 }
 
-func getNextMoveSafetyScore(state types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
+func getNextMoveSafetyScore(state *types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
 	myHead := state.You.Body[0]
 	safeMoves := getSafeMoves(state)
 
@@ -585,7 +585,7 @@ func getNextMoveSafetyScore(state types.GameState, opponentMoves map[string][]ty
 /**************************************************************/
 
 // Move function
-func Domove5(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove5(state *types.GameState) types.BattlesnakeMoveResponse {
 	opponentMoves := getAllOpponentMoves(state)
 	safetyScore, chosenMove := getNextMoveSafetyScoreV2(state, opponentMoves)
 
@@ -604,7 +604,7 @@ func Domove5(state types.GameState) types.BattlesnakeMoveResponse {
 	return types.BattlesnakeMoveResponse{Move: chosenMove}
 }
 
-func simulateMoveV2(state types.GameState, move string, lookAheadMoves int) types.GameState {
+func simulateMoveV2(state *types.GameState, move string, lookAheadMoves int) *types.GameState {
 	if lookAheadMoves <= 0 {
 		return state
 	}
@@ -638,7 +638,7 @@ func getDirection(currentHead, newHead types.Coord) string {
 }
 
 // getNextMoveSafetyScoreV2 function
-func getNextMoveSafetyScoreV2(state types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
+func getNextMoveSafetyScoreV2(state *types.GameState, opponentMoves map[string][]types.Coord) (int, string) {
 	myHead := state.You.Body[0]
 	safeMoves := getSafeMoves(state)
 
@@ -692,7 +692,7 @@ func getNextMoveSafetyScoreV2(state types.GameState, opponentMoves map[string][]
 
 const maxCalculationTime = 30 * time.Millisecond
 
-func Domove6(state types.GameState) types.BattlesnakeMoveResponse {
+func Domove6(state *types.GameState) types.BattlesnakeMoveResponse {
 	myHead := state.You.Body[0]
 	opponentMoves := getAllOpponentMoves(state)
 	var chosenMove string

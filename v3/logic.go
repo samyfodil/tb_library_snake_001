@@ -44,7 +44,7 @@ func isCoordInBounds(coord types.Coord, width int, height int) bool {
 	return coord.X >= 0 && coord.X < width && coord.Y >= 0 && coord.Y < height
 }
 
-func createBoard(state types.GameState) [][]float64 {
+func createBoard(state *types.GameState) [][]float64 {
 	board := make([][]float64, state.Board.Height)
 	for i := range board {
 		board[i] = make([]float64, state.Board.Width)
@@ -87,7 +87,7 @@ func createBoard(state types.GameState) [][]float64 {
 	return board
 }
 
-func isCoordInSnakeLists(state types.GameState, coord types.Coord) bool {
+func isCoordInSnakeLists(state *types.GameState, coord types.Coord) bool {
 	for _, snake := range state.Board.Snakes {
 		if isCoordInList(coord, snake.Body) {
 			return true
@@ -132,7 +132,7 @@ func filter(coords []types.Coord, condition func(types.Coord) bool) []types.Coor
 	return filtered
 }
 
-func calculateFutureBoards(state types.GameState, n int) [][][]float64 {
+func calculateFutureBoards(state *types.GameState, n int) [][][]float64 {
 	futureBoards := make([][][]float64, n)
 
 	for i := 0; i < n; i++ {
@@ -176,7 +176,7 @@ func averageBoards(boards [][][]float64) [][]float64 {
 	return averagedBoard
 }
 
-func Move(state types.GameState) types.BattlesnakeMoveResponse {
+func Move(state *types.GameState) types.BattlesnakeMoveResponse {
 	N := 4 // Number of possible future boards
 	futureBoards := calculateFutureBoards(state, N)
 	averagedBoard := averageBoards(futureBoards)

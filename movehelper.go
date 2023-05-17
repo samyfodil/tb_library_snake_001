@@ -23,7 +23,7 @@ func (mh MoveHelper) isBodyCollision(point types.Coord, body []types.Coord) bool
 	return false
 }
 
-func (mh MoveHelper) getAllowedMoves(state types.GameState) []string {
+func (mh MoveHelper) getAllowedMoves(state *types.GameState) []string {
 	allowedMoves := []string{"up", "down", "left", "right"}
 
 	head := state.You.Body[0]
@@ -82,12 +82,12 @@ func (mh MoveHelper) randFloat() float64 {
 	return rand.Float64()
 }
 
-func (mh MoveHelper) isMoveSafe(state types.GameState, move string) bool {
+func (mh MoveHelper) isMoveSafe(state *types.GameState, move string) bool {
 	newHead := mh.getNewHead(state.You.Body[0], move)
 	return mh.isInBounds(newHead, state.Board) && !mh.isCollidingWithSelf(newHead, state.You.Body)
 }
 
-func (mh MoveHelper) getCollisionScore(state types.GameState, move string) int {
+func (mh MoveHelper) getCollisionScore(state *types.GameState, move string) int {
 	newHead := mh.getNewHead(state.You.Body[0], move)
 	return mh.distanceToClosestCollision(newHead, state.Board)
 }
@@ -160,7 +160,7 @@ func (mh MoveHelper) distanceToClosestCollision(coord types.Coord, board types.B
 	return minDist
 }
 
-func (mh MoveHelper) DeepCopy(state types.GameState) types.GameState {
+func (mh MoveHelper) DeepCopy(state *types.GameState) types.GameState {
 	copiedState := types.GameState{}
 	copiedState.Turn = state.Turn
 	copiedState.You = state.You

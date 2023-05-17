@@ -81,8 +81,8 @@ type BattlesnakeMoveResponse struct {
 	Shout string `json:"shout"`
 }
 
-func (original *GameState) Copy() GameState {
-	copied := GameState{
+func (original *GameState) Copy() *GameState {
+	copied := &GameState{
 		Game: original.Game,
 		Turn: original.Turn,
 		Board: Board{

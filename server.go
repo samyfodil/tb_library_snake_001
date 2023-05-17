@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 
+	"github.com/samyfodil/tb_library_snake_001/dad"
 	"github.com/samyfodil/tb_library_snake_001/types"
 	v1 "github.com/samyfodil/tb_library_snake_001/v1"
 	v2 "github.com/samyfodil/tb_library_snake_001/v2"
@@ -73,7 +74,7 @@ func move(e event.Event) uint32 {
 
 	h.Headers().Set("Server", ServerID)
 
-	state := types.GameState{}
+	state := &types.GameState{}
 
 	data, err := io.ReadAll(h.Body())
 	if err != nil {
@@ -106,6 +107,8 @@ func move(e event.Event) uint32 {
 		response = v2.Move(state)
 	case "tau007":
 		response = v3.Move(state)
+	case "taudad":
+		response = dad.Move(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")
