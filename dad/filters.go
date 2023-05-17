@@ -326,7 +326,7 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 func FilterPossibleMovesPass1(data *MoveRequest, directions []string) []string {
 	ret := make([]string, 0)
 	for _, direc := range directions {
-		if data.Direcs[direc].Moves > 0 {
+		if data.Direcs[direc] != nil && data.Direcs[direc].Moves > 0 {
 			head := data.Snakes[data.MyIndex].Head()
 			if head == nil {
 				break
