@@ -6,6 +6,7 @@ import (
 	"github.com/samyfodil/tb_library_snake_001/types"
 	v1 "github.com/samyfodil/tb_library_snake_001/v1"
 	v2 "github.com/samyfodil/tb_library_snake_001/v2"
+	v3 "github.com/samyfodil/tb_library_snake_001/v3"
 
 	"github.com/taubyte/go-sdk/event"
 )
@@ -103,6 +104,8 @@ func move(e event.Event) uint32 {
 		response = v1.Domove5(state)
 	case "tau006":
 		response = v2.Move(state)
+	case "tau007":
+		response = v3.Move(state)
 	}
 
 	h.Headers().Set("Content-Type", "application/json")

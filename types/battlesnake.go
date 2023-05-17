@@ -80,3 +80,32 @@ type BattlesnakeMoveResponse struct {
 	Move  string `json:"move"`
 	Shout string `json:"shout"`
 }
+
+func (original *GameState) Copy() GameState {
+	copied := GameState{
+		Game: original.Game,
+		Turn: original.Turn,
+		Board: Board{
+			Height: original.Board.Height,
+			Width:  original.Board.Width,
+			Food:   make([]Coord, len(original.Board.Food)),
+			Snakes: make([]Battlesnake, len(original.Board.Snakes)),
+		},
+		You: original.You,
+	}
+
+	copy(copied.Board.Food, original.Board.Food)
+
+	for i, snake := range original.Board.Snakes {
+		copiedSnake := Battlesnake{
+			ID:     snake.ID,
+			Name:   snake.Name,
+			Health: snake.Health,
+			Body:   make([]Coord, len(snake.Body)),
+		}
+		copy(copiedSnake.Body, snake.Body)
+		copied.Board.Snakes[i] = copiedSnake
+	}
+
+	return copied
+}
