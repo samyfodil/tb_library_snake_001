@@ -233,6 +233,19 @@ func chooseBestMove(state types.GameState, safeMoves []string) string {
 	// Prioritize getting food when health is below the dynamic threshold
 	shouldGetFood := state.You.Health < healthThreshold
 
+	// Find the length of the biggest snake on the board
+	biggestSnakeLength := 0
+	for _, snake := range state.Board.Snakes {
+		if len(snake.Body) > biggestSnakeLength {
+			biggestSnakeLength = len(snake.Body)
+		}
+	}
+
+	// If the snake's length is less than the biggest snake's length, prioritize getting food
+	if len(state.You.Body) < biggestSnakeLength {
+		shouldGetFood = true
+	}
+
 	for _, move := range safeMoves {
 		newHead := applyMove(myHead, move)
 
