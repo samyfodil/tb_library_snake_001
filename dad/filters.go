@@ -323,8 +323,8 @@ func FilterMovesVsSpace(data *MoveRequest, moves []string) []string {
 	return ret
 }
 
-func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
-	ret := []string{}
+func FilterPossibleMovesPass1(data *MoveRequest, directions []string) []string {
+	ret := make([]string, 0)
 	for _, direc := range directions {
 		if data.Direcs[direc].Moves > 0 {
 			head := data.Snakes[data.MyIndex].Head()
@@ -335,6 +335,11 @@ func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
 			}
 		}
 	}
+	return ret
+}
+
+func FilterPossibleMoves(data *MoveRequest, directions []string) []string {
+	ret := FilterPossibleMovesPass1(data, directions)
 
 	if len(ret) == 0 {
 		data.GenHazards(data, false)

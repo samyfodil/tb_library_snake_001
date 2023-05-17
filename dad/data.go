@@ -467,10 +467,10 @@ type Snake struct {
 	Id           string  `json:"id"`
 	Name         string  `json:"name"`
 	Taunt        string  `json:"taunt"`
-	HeadStack    *Stack
-	TailStack    *Stack
-	HeadPoint    *Point
-	FoodHash     map[string]*FoodData
+	// HeadStack    *Stack
+	// TailStack    *Stack
+	HeadPoint *Point
+	// FoodHash     map[string]*FoodData
 }
 
 func (snake Snake) Head() *Point    { return snake.HeadPoint }
