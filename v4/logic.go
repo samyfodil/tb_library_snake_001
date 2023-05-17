@@ -7,7 +7,7 @@ import (
 	"github.com/samyfodil/tb_library_snake_001/types"
 )
 
-var LookStepsAhead = 2
+var LookStepsAhead = 16
 
 // Initialize the random seed
 func init() {
