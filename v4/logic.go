@@ -1,12 +1,13 @@
 package v4
 
 import (
-	"math"
 	"math/rand"
 	"time"
 
 	"github.com/samyfodil/tb_library_snake_001/types"
 )
+
+var LookStepsAhead = 2
 
 // Initialize the random seed
 func init() {
@@ -43,10 +44,8 @@ func isCoordInList(coord types.Coord, list []types.Coord) bool {
 func predictSnakesNextPositions(state *types.GameState) types.Board {
 	board := state.Board
 	for i, snake := range board.Snakes {
-		// Remove dead snakes
+		// Skip dead snakes
 		if snake.Health <= 1 || (isCoordInList(snake.Body[0], state.Board.Hazards) && snake.Health <= 16) {
-			board.Snakes = append(board.Snakes[:i], board.Snakes[i+1:]...)
-			i-- // Adjust the loop index since we removed an element
 			continue
 		}
 
@@ -72,7 +71,6 @@ func predictSnakesNextPositions(state *types.GameState) types.Board {
 
 func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) []string {
 	board := state.Board
-	possibleMoves := []string{"up", "down", "left", "right"}
 
 	// Initialize move scores
 	moveScores := make(map[string]int)
@@ -89,13 +87,7 @@ func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) 
 		}
 
 		// Check if the new head position is in your own body
-		if isCoordInList(newHead, body[1:]) {
-			moveScores[move] = -1000
-			continue
-		}
-
-		// Check if the new head position is in your own body
-		if isCoordInList(newHead, body[:len(body)-1]) {
+		if isCoordInList(newHead, body) {
 			moveScores[move] = -1000
 			continue
 		}
@@ -114,42 +106,53 @@ func getSafeMoves(state *types.GameState, head types.Coord, body []types.Coord) 
 			for _, otherMove := range possibleMoves {
 				otherNewHead := applyMove(otherSnake.Head, otherMove)
 				if newHead == otherNewHead {
-					if len(body) > len(otherSnake.Body) {
-						moveScores[move] = -500
-					} else {
+					if len(otherSnake.Body) >= len(body) {
 						moveScores[move] = -1000
 					}
-					break
+					continue
 				}
 			}
 		}
 
-		// Add hazard penalty
-		if isHeadInHazard && isCoordInList(newHead, board.Hazards) {
-			moveScores[move] -= 200
-		}
-	}
-
-	// Find the best moves
-	bestScore := math.MinInt32
-	bestMoves := []string{}
-	for move, score := range moveScores {
-		if score == -1000 {
+		// Check if the new head position is in a hazard
+		if isCoordInList(newHead, board.Hazards) {
+			if !isHeadInHazard {
+				moveScores[move] = -500
+			} else {
+				moveScores[move] = 0
+			}
 			continue
 		}
+
+		// Default score for a safe move
+		moveScores[move] = 100
+	}
+
+	// Find the best move based on scores
+	bestMove := ""
+	bestScore := -1001
+	for move, score := range moveScores {
 		if score > bestScore {
 			bestScore = score
-			bestMoves = []string{move}
-		} else if score == bestScore {
-			bestMoves = append(bestMoves, move)
+			bestMove = move
 		}
 	}
 
-	return bestMoves
+	// If there's no best move, return an empty slice
+	if bestScore <= -1000 {
+		return []string{}
+	}
+
+	return []string{bestMove}
 }
 
 func isCoordInSnakeLists(state *types.GameState, coord types.Coord) bool {
 	for _, snake := range state.Board.Snakes {
+		// Skip the dead snakes
+		if snake.Health <= 1 || (isCoordInList(snake.Body[0], state.Board.Hazards) && snake.Health <= 16) {
+			continue
+		}
+
 		if isCoordInList(coord, snake.Body) {
 			return true
 		}
@@ -157,31 +160,8 @@ func isCoordInSnakeLists(state *types.GameState, coord types.Coord) bool {
 	return false
 }
 
-// Minimax
-
-const maxDepth = 3
-
-func calculateVoronoi(board *types.Board, snakes []types.Battlesnake) map[string]int {
-	voronoi := make(map[string]int)
-
-	for x := 0; x < board.Width; x++ {
-		for y := 0; y < board.Height; y++ {
-			minDistance := math.MaxInt32
-			minSnakeID := ""
-
-			for _, snake := range snakes {
-				distance := abs(snake.Head.X-x) + abs(snake.Head.Y-y)
-				if distance < minDistance {
-					minDistance = distance
-					minSnakeID = snake.ID
-				}
-			}
-
-			voronoi[minSnakeID]++
-		}
-	}
-
-	return voronoi
+func distance(a, b types.Coord) int {
+	return abs(a.X-b.X) + abs(a.Y-b.Y)
 }
 
 func abs(x int) int {
@@ -191,74 +171,222 @@ func abs(x int) int {
 	return x
 }
 
-func evaluateState(state *types.GameState) float64 {
-	// Basic evaluation function that compares your snake's length to the other snakes' lengths and Voronoi territories
-	mySnake := state.You
-	myScore := float64(len(mySnake.Body))
-
-	voronoi := calculateVoronoi(&state.Board, state.Board.Snakes)
-	myScore += float64(voronoi[mySnake.ID])
-
-	for _, otherSnake := range state.Board.Snakes {
-		if otherSnake.ID == mySnake.ID {
-			continue
-		}
-		myScore -= float64(len(otherSnake.Body))
-		myScore -= float64(voronoi[otherSnake.ID])
+func shuffleMoves(moves []string) {
+	for i := len(moves) - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)
+		moves[i], moves[j] = moves[j], moves[i]
 	}
-
-	return myScore
 }
 
-func minimax(state *types.GameState, depth int, isMaximizing bool) float64 {
-	if depth == 0 {
-		return evaluateState(state)
+func isSafeMove(newHead types.Coord, state *types.GameState) bool {
+	// Check if the new head position is within the board boundaries
+	if newHead.X < 0 || newHead.Y < 0 || newHead.X >= state.Board.Width || newHead.Y >= state.Board.Height {
+		return false
 	}
-	if isMaximizing {
-		maxEval := math.Inf(-1)
-		moves := getSafeMoves(state, state.You.Head, state.You.Body)
 
-		for _, move := range moves {
-			newState := state.Copy()
-			newState.You.Head = applyMove(newState.You.Head, move)
-			newState.Board = predictSnakesNextPositions(newState)
-			eval := minimax(newState, depth-1, false)
-			maxEval = math.Max(maxEval, eval)
+	// Check if the new head position collides with the snake's own body
+	if isCoordInList(newHead, state.You.Body) {
+		return false
+	}
+
+	// Check if the new head position collides with other snakes
+	for _, snake := range state.Board.Snakes {
+		// Skip the dead snakes
+		if snake.Health <= 1 || (isCoordInList(snake.Body[0], state.Board.Hazards) && snake.Health <= 16) {
+			continue
 		}
 
-		return maxEval
-	} else {
-		minEval := math.Inf(1)
-		moves := getSafeMoves(state, state.You.Head, state.You.Body)
+		if isCoordInList(newHead, snake.Body) {
+			return false
+		}
+	}
 
-		for _, move := range moves {
-			newState := state.Copy()
-			newState.You.Head = applyMove(newState.You.Head, move)
-			newState.Board = predictSnakesNextPositions(newState)
-			eval := minimax(newState, depth-1, true)
-			minEval = math.Min(minEval, eval)
+	return true
+}
+
+func countSegmentsInHazard(snake types.Battlesnake, board types.Board) int {
+	segmentsInHazard := 0
+	for _, segment := range snake.Body {
+		for _, hazard := range board.Hazards {
+			if segment.X == hazard.X && segment.Y == hazard.Y {
+				segmentsInHazard++
+			}
+		}
+	}
+	return segmentsInHazard
+}
+
+func freeSpaceRatio(state *types.GameState) float64 {
+	totalSpaces := state.Board.Width * state.Board.Height
+	occupiedSpaces := 0
+
+	for _, snake := range state.Board.Snakes {
+		occupiedSpaces += len(snake.Body)
+	}
+
+	freeSpaces := totalSpaces - occupiedSpaces
+	return float64(freeSpaces) / float64(totalSpaces)
+}
+
+var possibleMoves = []string{"up", "down", "left", "right"}
+
+func chooseBestMove(state *types.GameState, safeMoves []string) string {
+	myHead := state.You.Head
+	minDist := state.Board.Width*state.Board.Height + 1
+	maxDist := -1
+
+	bestMoves := []string{}
+
+	// Calculate the number of snake body segments in the hazard area
+	segmentsInHazard := countSegmentsInHazard(state.You, state.Board)
+	hazardWeight := float64(segmentsInHazard) * 1.5 // Adjust the multiplier as needed to fine-tune the prioritization
+
+	// Calculate the free space ratio
+	spaceRatio := freeSpaceRatio(state)
+
+	// Calculate the dynamic health threshold
+	healthThreshold := 30 + int((1-spaceRatio)*40) // This threshold ranges between 30 and 70 based on spaceRatio
+
+	// Prioritize getting food when health is below the dynamic threshold
+	shouldGetFood := state.You.Health < healthThreshold
+
+	// Find the length of the biggest snake on the board
+	biggestSnakeLength := 0
+	for _, snake := range state.Board.Snakes {
+		if len(snake.Body) > biggestSnakeLength {
+			biggestSnakeLength = len(snake.Body)
+		}
+	}
+
+	// If the snake's length is less than the biggest snake's length, prioritize getting food
+	if len(state.You.Body) < biggestSnakeLength {
+		shouldGetFood = true
+	}
+
+	for _, move := range safeMoves {
+		newHead := applyMove(myHead, move)
+
+		// Check if the new head position is in a hazard
+		inHazard := isCoordInList(newHead, state.Board.Hazards)
+
+		// Move out of the hazard area when more of the snake's body is in it
+		if inHazard {
+			if hazardWeight > 0 {
+				hazardWeight -= 1
+				continue
+			}
 		}
 
-		return minEval
+		// Keep the original logic for choosing the best move based on distance to food, but prioritize based on health
+		for _, food := range state.Board.Food {
+			dist := distance(newHead, food)
+			if shouldGetFood {
+				// If the snake should get food, prioritize the moves that minimize the distance to food
+				if dist <= minDist {
+					minDist = dist
+					bestMoves = append(bestMoves, move)
+				}
+			} else {
+				// If the snake should not get food, prioritize the moves that maximize the distance to food
+				if dist >= maxDist {
+					maxDist = dist
+					bestMoves = append(bestMoves, move)
+				}
+			}
+		}
+
+		// Check for possible head-to-head collisions with other snakes
+		for _, otherSnake := range state.Board.Snakes {
+			if otherSnake.ID == state.You.ID {
+				continue
+			}
+			for _, otherMove := range possibleMoves {
+				otherNewHead := applyMove(otherSnake.Head, otherMove)
+				if newHead == otherNewHead {
+					// If the snake is smaller or equal in size to the other snake, avoid the move
+					if len(state.You.Body) <= len(otherSnake.Body) {
+						continue
+					}
+				}
+			}
+		}
 	}
+
+	// Shuffle the best moves list
+	shuffleMoves(bestMoves)
+
+	// Find the first safe move from the shuffled list
+	for _, move := range bestMoves {
+		newHead := applyMove(state.You.Head, move)
+
+		if isSafeMove(newHead, state) {
+			return move
+		}
+	}
+
+	// If there are no safe moves, return a random one
+	return safeMoves[rand.Intn(len(safeMoves))]
+}
+
+func isMoveSafeAfterNSteps(state *types.GameState, move string, steps int) bool {
+	if steps == 0 {
+		return true
+	}
+
+	// Apply the move to the current head position
+	newHead := applyMove(state.You.Head, move)
+
+	// Check if the new head position is inside the board
+	if newHead.X < 0 || newHead.X >= state.Board.Width || newHead.Y < 0 || newHead.Y >= state.Board.Height {
+		return false
+	}
+
+	// Create a new state where our snake has made the move
+	newBody := append([]types.Coord{newHead}, state.You.Body[:len(state.You.Body)-1]...)
+	newState := state
+	newState.You.Body = newBody
+	newState.You.Head = newHead
+
+	// Predict the next positions of all snakes, including our own
+	newState.Board = predictSnakesNextPositions(newState)
+
+	// Get the safe moves for the new state
+	safeMoves := getSafeMoves(newState, newState.You.Head, newState.You.Body)
+
+	// If there are no safe moves left in the new state, the initial move is not safe
+	if len(safeMoves) == 0 {
+		return false
+	}
+
+	// Check if the moves are safe after N-1 steps
+	for _, nextMove := range safeMoves {
+		if !isMoveSafeAfterNSteps(newState, nextMove, steps-1) {
+			return false
+		}
+	}
+
+	return true
 }
 
 func Move(state *types.GameState) types.BattlesnakeMoveResponse {
-	bestScore := math.Inf(-1)
-	bestMove := ""
+	// Get safe moves for our snake based on the current state
+	safeMoves := getSafeMoves(state, state.You.Head, state.You.Body)
 
-	moves := getSafeMoves(state, state.You.Head, state.You.Body)
-	for _, move := range moves {
-		newState := state.Copy()
-		newState.You.Head = applyMove(newState.You.Head, move)
-		newState.Board = predictSnakesNextPositions(newState)
-		score := minimax(newState, maxDepth-1, false)
-
-		if score > bestScore {
-			bestScore = score
-			bestMove = move
+	// Filter out moves that would not be safe after N steps
+	safeMovesAfterNSteps := make([]string, 0, len(safeMoves))
+	for _, move := range safeMoves {
+		if isMoveSafeAfterNSteps(state, move, LookStepsAhead) {
+			safeMovesAfterNSteps = append(safeMovesAfterNSteps, move)
 		}
 	}
 
-	return types.BattlesnakeMoveResponse{Move: bestMove}
+	// If there are no safe moves left after filtering, fall back to the initial safe moves
+	if len(safeMovesAfterNSteps) == 0 {
+		safeMovesAfterNSteps = safeMoves
+	}
+
+	// Choose the best move based on your criteria (e.g., move towards food)
+	nextMove := chooseBestMove(state, safeMovesAfterNSteps)
+
+	return types.BattlesnakeMoveResponse{Move: nextMove}
 }
